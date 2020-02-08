@@ -156,7 +156,9 @@ namespace Xenko.Core.Assets
                         }
 
                         //check if the item is already there, this is possible when saving the first time when creating from a template
-                        if (project.Items.All(x => x.EvaluatedInclude != projectInclude))
+                        // Note: if project has auto items, no need to add it
+                        if (project.Items.All(x => x.EvaluatedInclude != projectInclude)
+                            && (string.Compare(project.GetPropertyValue("EnableDefaultCompileItems"), "true", true, CultureInfo.InvariantCulture) != 0))
                         {
                             var generatorAsset = projectAsset as IProjectFileGeneratorAsset;
                             if (generatorAsset != null)
@@ -181,9 +183,7 @@ namespace Xenko.Core.Assets
                             }
                             else
                             {
-                                // Note: if project has auto items, no need to add it
-                                if (string.Compare(project.GetPropertyValue("EnableDefaultCompileItems"), "true", true, CultureInfo.InvariantCulture) != 0)
-                                    project.AddItem("Compile", projectInclude);
+                                project.AddItem("Compile", projectInclude);
                             }
                         }
                     }
@@ -385,6 +385,11 @@ namespace Xenko.Core.Assets
 
         protected override void SavePackage()
         {
+            // Check if our project is still implicit one
+            // Note: we only allow transition from implicit to explicit (otherwise we would have to delete file, etc.)
+            if (IsImplicitProject && Package.IsDirty && !Package.IsImplicitProject)
+                IsImplicitProject = false;
+
             if (!IsImplicitProject)
                 base.SavePackage();
         }
@@ -404,10 +409,10 @@ namespace Xenko.Core.Assets
         /// <summary>
         /// The visual studio version property used for newly created project solution files
         /// </summary>
-        public static readonly Version DefaultVisualStudioVersion = new Version("14.0.23107.0");
+        public static readonly Version DefaultVisualStudioVersion = new Version("16.0.0.0");
 
         internal static readonly string SolutionHeader = @"Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
+# Visual Studio 16
 VisualStudioVersion = {0}
 MinimumVisualStudioVersion = {0}".ToFormat(DefaultVisualStudioVersion);
 

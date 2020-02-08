@@ -8,6 +8,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.Build.Evaluation;
@@ -16,10 +18,12 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
 using NShader;
 using Xenko.VisualStudio.BuildEngine;
 using Xenko.VisualStudio.Commands;
 using Xenko.VisualStudio.Shaders;
+using Task = System.Threading.Tasks.Task;
 
 namespace Xenko.VisualStudio
 {
@@ -38,7 +42,7 @@ namespace Xenko.VisualStudio
     /// </summary>
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", Version, IconResourceID = 400)]
@@ -48,7 +52,7 @@ namespace Xenko.VisualStudio
     //[ProvideToolWindow(typeof (MyToolWindow))]
     [Guid(GuidList.guidXenko_VisualStudio_PackagePkgString)]
     // Xenko Shader LanguageService
-    [ProvideService(typeof(NShaderLanguageService), ServiceName = "Xenko Shader Language Service")]
+    [ProvideService(typeof(NShaderLanguageService), ServiceName = "Xenko Shader Language Service", IsAsyncQueryable = true)]
     [ProvideLanguageServiceAttribute(typeof(NShaderLanguageService),
                              "Xenko Shader Language",
                              0,
@@ -60,17 +64,20 @@ namespace Xenko.VisualStudio
                              )]
     [ProvideLanguageExtensionAttribute(typeof(NShaderLanguageService), NShaderSupportedExtensions.Xenko_Shader)]
     [ProvideLanguageExtensionAttribute(typeof(NShaderLanguageService), NShaderSupportedExtensions.Xenko_Effect)]
+    // Xenko C# Effect Code Generator
+    [CodeGeneratorRegistration(typeof(EffectCodeFileGenerator), EffectCodeFileGenerator.InternalName, GuidList.vsContextGuidVCSProject, GeneratorRegKeyName = ".xkfx")]
+    [CodeGeneratorRegistration(typeof(EffectCodeFileGenerator), EffectCodeFileGenerator.DisplayName, GuidList.vsContextGuidVCSProject, GeneratorRegKeyName = EffectCodeFileGenerator.InternalName, GeneratesDesignTimeSource = true, GeneratesSharedDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(EffectCodeFileGenerator), EffectCodeFileGenerator.InternalName, GuidList.vsContextGuidVCSNewProject, GeneratorRegKeyName = ".xkfx")]
+    [CodeGeneratorRegistration(typeof(EffectCodeFileGenerator), EffectCodeFileGenerator.DisplayName, GuidList.vsContextGuidVCSNewProject, GeneratorRegKeyName = EffectCodeFileGenerator.InternalName, GeneratesDesignTimeSource = true, GeneratesSharedDesignTimeSource = true)]
     // Xenko C# Shader Key Generator
     [CodeGeneratorRegistration(typeof(ShaderKeyFileGenerator), ShaderKeyFileGenerator.InternalName, GuidList.vsContextGuidVCSProject, GeneratorRegKeyName = ".xksl")]
-    [CodeGeneratorRegistration(typeof(ShaderKeyFileGenerator), ShaderKeyFileGenerator.InternalName, GuidList.vsContextGuidVCSProject, GeneratorRegKeyName = ".xkfx")]
     [CodeGeneratorRegistration(typeof(ShaderKeyFileGenerator), ShaderKeyFileGenerator.DisplayName, GuidList.vsContextGuidVCSProject, GeneratorRegKeyName = ShaderKeyFileGenerator.InternalName, GeneratesDesignTimeSource = true, GeneratesSharedDesignTimeSource = true)]
     [CodeGeneratorRegistration(typeof(ShaderKeyFileGenerator), ShaderKeyFileGenerator.InternalName, GuidList.vsContextGuidVCSNewProject, GeneratorRegKeyName = ".xksl")]
-    [CodeGeneratorRegistration(typeof(ShaderKeyFileGenerator), ShaderKeyFileGenerator.InternalName, GuidList.vsContextGuidVCSNewProject, GeneratorRegKeyName = ".xkfx")]
     [CodeGeneratorRegistration(typeof(ShaderKeyFileGenerator), ShaderKeyFileGenerator.DisplayName, GuidList.vsContextGuidVCSNewProject, GeneratorRegKeyName = ShaderKeyFileGenerator.InternalName, GeneratesDesignTimeSource = true, GeneratesSharedDesignTimeSource = true)]
     // Temporarily force load for easier debugging
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
-    public sealed class XenkoPackage : Package, IOleComponent
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string, PackageAutoLoadFlags.BackgroundLoad)]
+    public sealed class XenkoPackage : AsyncPackage, IOleComponent
     {
         public const string Version = "2.0";
 
@@ -103,35 +110,43 @@ namespace Xenko.VisualStudio
         ///     Initialization of the package; this method is called right after the package is sited, so this is the place
         ///     where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
-            base.Initialize();
+            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering InitializeAsync() of: {0}", ToString()));
+            await base.InitializeAsync(cancellationToken, progress);
 
             IDEBuildLogger.UserRegistryRoot = UserRegistryRoot;
 
+            // Switching to main thread to use GetService RPC and cast to service interface (which may involve COM operations)
+            // Note: most of our work is not supposed to be heavy, mostly registration of services and callbacks
+            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
             solutionEventsListener = new SolutionEventsListener(this);
             solutionEventsListener.BeforeSolutionClosed += solutionEventsListener_BeforeSolutionClosed;
-            solutionEventsListener.AfterSolutionBackgroundLoadComplete += solutionEventsListener_AfterSolutionBackgroundLoadComplete;
+            solutionEventsListener.AfterSolutionOpened += solutionEventsListener_AfterSolutionOpened;
             solutionEventsListener.AfterActiveConfigurationChange += SolutionEventsListener_AfterActiveConfigurationChange;
             solutionEventsListener.StartupProjectChanged += SolutionEventsListener_OnStartupProjectChanged;
 
             dte2 = GetGlobalService(typeof(SDTE)) as DTE2;
 
             // Register the C# language service
-            var serviceContainer = this as IServiceContainer;
-            errorListProvider = new ErrorListProvider(this)
-            {
-                ProviderGuid = new Guid("ad1083c5-32ad-403d-af3d-32fee7abbdf1"),
-                ProviderName = "Xenko Shading Language"
-            };
-            var langService = new NShaderLanguageService(errorListProvider);
-            langService.SetSite(this);
-            langService.InitializeColors(); // Make sure to initialize colors before registering!
-            serviceContainer.AddService(typeof(NShaderLanguageService), langService, true);
+            // inspiration & credits: https://github.com/IInspectable/Nav.Language.Extensions/commit/08af3d897afac5a54975660fa03f4b629da405e1#diff-b73c0f368f242625f60cfad9cc11f2d5R88
+            AddService(typeof(NShaderLanguageService), async (container, ct, type) =>
+                {
+                   await JoinableTaskFactory.SwitchToMainThreadAsync(ct);
+                   errorListProvider = new ErrorListProvider(this)
+                   {
+                       ProviderGuid = new Guid("ad1083c5-32ad-403d-af3d-32fee7abbdf1"),
+                       ProviderName = "Xenko Shading Language"
+                   };
+                   var langService = new NShaderLanguageService(errorListProvider);
+                   langService.SetSite(this);
+                   langService.InitializeColors(); // Make sure to initialize colors before registering!
+                   return langService;
+               }, true);
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
                 XenkoCommands.ServiceProvider = this;
@@ -154,6 +169,14 @@ namespace Xenko.VisualStudio
                 crinfo[0].uIdleTimeInterval = 1000;
                 int hr = mgr.FRegisterComponent(this, crinfo, out m_componentID);
             }
+
+            // If there's already a solution loaded, process it
+            var dte = (DTE)GetService(typeof(DTE));
+            if (dte.Solution.IsOpen)
+                await InitializeCommandProxy();
+
+            // Go back to async thread
+            await TaskScheduler.Default;
         }
 
         public static bool IsProjectExecutable(EnvDTE.Project project)
@@ -290,7 +313,7 @@ namespace Xenko.VisualStudio
             }
         }
 
-        private async void solutionEventsListener_AfterSolutionBackgroundLoadComplete()
+        private async void solutionEventsListener_AfterSolutionOpened()
         {
             await InitializeCommandProxy();
         }
@@ -381,7 +404,7 @@ namespace Xenko.VisualStudio
                     {
                         generalOutputPane.OutputStringThreadSafe($"Error Initializing Xenko Language Service: {ex.InnerException ?? ex}\r\n");
                         generalOutputPane.Activate();
-                        errorListProvider.Tasks.Add(new ErrorTask(ex.InnerException ?? ex));
+                        errorListProvider?.Tasks.Add(new ErrorTask(ex.InnerException ?? ex));
                     }
                 });
             thread.Start();

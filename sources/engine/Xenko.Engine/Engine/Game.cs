@@ -30,7 +30,7 @@ namespace Xenko.Engine
     /// <summary>
     /// Main Game class system.
     /// </summary>
-    public class Game : GameBase, ISceneRendererContext
+    public class Game : GameBase, ISceneRendererContext, IGameSettingsService
     {
         /// <summary>
         /// Static event that will be fired when a game is initialized
@@ -272,6 +272,8 @@ namespace Xenko.Engine
                         if (!deviceManager.ShaderProfile.HasValue)
                             deviceManager.ShaderProfile = renderingSettings.DefaultGraphicsProfile;
                     }
+
+                    Services.AddService<IGameSettingsService>(this);
                 }
 
                 // Load several default settings
@@ -416,7 +418,8 @@ namespace Xenko.Engine
         {
             if (databaseFileProvider != null)
             {
-                ((DatabaseFileProviderService)Services.GetService<IDatabaseFileProviderService>()).FileProvider = null;
+                if (Services.GetService<IDatabaseFileProviderService>() is DatabaseFileProviderService dbfp)
+                    dbfp.FileProvider = null;
                 databaseFileProvider.Dispose();
                 databaseFileProvider = null;
             }

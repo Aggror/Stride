@@ -49,6 +49,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Announcements\Release30.md" />
+    <None Remove="Resources\list-26.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xenko.Metrics" Version="1.0.0" />
@@ -62,10 +63,6 @@
     </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\deps\ExpressionBlendSDK\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -125,6 +122,7 @@
   <ItemGroup>
     <EmbeddedResource Update="Announcements\Release30.md" />
     <Resource Include="Resources\EditorIcon.png" />
+    <Resource Include="Resources\list-26.png" />
     <Resource Include="Resources\update.png" />
     <Resource Include="Resources\roadmap.png" />
     <Resource Include="Resources\survey.png" />
@@ -199,7 +197,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\..\editor\Xenko.PrivacyPolicy\Xenko.PrivacyPolicy.projitems" Label="Shared" Condition="Exists('..\..\editor\Xenko.PrivacyPolicy\Xenko.PrivacyPolicy.projitems')" />
   <Import Project="..\..\editor\Xenko.Core.MostRecentlyUsedFiles\Xenko.Core.MostRecentlyUsedFiles.projitems" Label="Shared" />
   <Import Project="..\..\assets\Xenko.Core.Assets.Yaml\Xenko.Core.Assets.Yaml.projitems" Label="Shared" />
