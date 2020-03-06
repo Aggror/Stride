@@ -52,6 +52,9 @@
     <ProjectReference Include="..\Xenko.Rendering\Xenko.Rendering.csproj" />
     <ProjectReference Include="..\Xenko.VirtualReality\Xenko.VirtualReality.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Rendering\Spline\" />
+  </ItemGroup>
   <Import Project="..\Xenko.Shared\Refactor\Xenko.Refactor.projitems" Label="Shared" />
   <Choose>
     <When Condition="'$(XenkoEffectCompiler)' == 'true'">
