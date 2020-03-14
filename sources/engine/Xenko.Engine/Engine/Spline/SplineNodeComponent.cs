@@ -6,6 +6,7 @@ using Xenko.Core;
 using Xenko.Core.Mathematics;
 using Xenko.Engine.Design;
 using Xenko.Engine.Processors;
+using Xenko.Engine.Spline;
 
 namespace Xenko.Engine
 {
@@ -50,7 +51,7 @@ namespace Xenko.Engine
         public bool DebugSegments { get; set; }
         public bool DebugNodesLink { get; set; }
 
-        private Vector3[] _curveNodesPositions;
+        private SplineNode _splineNode;
         private bool _calculateSubNodes = true;
 
 
@@ -68,14 +69,8 @@ namespace Xenko.Engine
         {
             if (Next != null && _calculateSubNodes)
             {
-                int nodes = Segments + 1;
-                    float increment = 1.0f / (float)Segments;
-
-                    _curveNodesPositions = new Vector3[nodes];
-                    for (int i = 0; i < nodes; i++)
-                    {
-                        _curveNodesPositions[i] = Vector3.Lerp(Entity.Transform.Position + new Vector3(0,2,0), Next.Entity.Transform.Position - Entity.Transform.Position, i * increment);
-                    }
+                _splineNode = new SplineNode(Segments, Entity.Transform.Position, OutHandler, Next.Entity.Transform.Position, Next.InHandler);
+                _splineNode.CalculateBezierSplineSpoints();
             }
         }
 
@@ -87,14 +82,14 @@ namespace Xenko.Engine
             }
         }
 
-        public Vector3[] GetSubNodePositions()
+        public SplineNode GetSplineNode()
         {
-            if(_curveNodesPositions == null)
+            if(_splineNode == null)
             {
                 CalculateBezierCurve();
             }
 
-            return _curveNodesPositions;
+            return _splineNode;
         }
     }
 }

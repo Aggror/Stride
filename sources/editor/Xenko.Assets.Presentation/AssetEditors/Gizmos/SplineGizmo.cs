@@ -89,9 +89,15 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
                 if (Component.DebugSegments)
                 {
-                    var nodes = Component.GetSubNodePositions();
+                    var splinePointsInfo = Component.GetSplineNode().GetSplinePointInfo();
+
+                    var splinePoints = new Vector3[splinePointsInfo.Length];
+                    for (int i = 0; i < splinePointsInfo.Length; i++)
+                    {
+                        splinePoints[i] = splinePointsInfo[i].position;
+                    }
                     var bezierCurveMesh = new LineMesh(GraphicsDevice);
-                    bezierCurveMesh.Build(nodes);
+                    bezierCurveMesh.Build(splinePoints);
                     debugEntityBezier.RemoveAll<ModelComponent>();
                     debugEntityBezier.Add(
                         new ModelComponent
