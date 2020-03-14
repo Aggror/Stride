@@ -30,6 +30,8 @@ namespace Xenko.Engine.Spline
             _targetHandlerPos = targetHandlerPos;
 
             _splinePoints = new SplinePointInfo[_nodesCount];
+
+            CalculateBezierSplineSpoints();
         }
 
 
@@ -59,7 +61,7 @@ namespace Xenko.Engine.Spline
             float t = 1.0f / _nodesCount;
             for (var i = 0; i < _nodesCount; i++)
             {
-                var p = CalculateBezierPoint(t * (i - 1));
+                var p = CalculateBezierPoint(t * (i));
                 _splinePoints[i].position = p;
 
                 if (i > 0)
@@ -71,7 +73,7 @@ namespace Xenko.Engine.Spline
                     //todo fix rotation
                     //_splinePoints[i - 1].rotation = oriPivot:GetRotation(true);
 
-                    if (i == _segments + 1)
+                    if (i == _nodesCount)
                     {
                         _splinePoints[i].rotation = _splinePoints[i - 1].rotation;
                     }
@@ -84,11 +86,10 @@ namespace Xenko.Engine.Spline
                 {
                     _splinePoints[i].distance = 0;
                     _splinePoints[i].totalDistance = 0;
-
                 }
             }
 
-            for (int i = 0; i < _splinePoints.Length; i++)
+            for (int i = 0; i < _nodesCount; i++)
             {
                 _splineLength += _splinePoints[i].distance;
             }
@@ -115,7 +116,7 @@ namespace Xenko.Engine.Spline
             //determine closest splinepoint
             var shortestSplinePointIndex = 1;
             float shortestSplinePointDistance = 0f;
-            for (var i = 0; i < _splinePoints.Length; i++)//do	
+            for (var i = 0; i < _nodesCount; i++)//do	
             {
                 var curSplinePointDistance = Vector3.Distance(_splinePoints[i].position, otherPosition);
 

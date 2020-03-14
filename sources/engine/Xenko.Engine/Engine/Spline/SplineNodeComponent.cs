@@ -57,7 +57,7 @@ namespace Xenko.Engine
 
         internal void Update(TransformComponent transformComponent)
         {
-             CalculateBezierCurve();
+            UpdateBezierCurve();
             
             if (Previous != null)
             {
@@ -65,20 +65,18 @@ namespace Xenko.Engine
             }  
         }
 
-        private void CalculateBezierCurve()
-        {
-            if (Next != null && _calculateSubNodes)
-            {
-                _splineNode = new SplineNode(Segments, Entity.Transform.Position, OutHandler, Next.Entity.Transform.Position, Next.InHandler);
-                _splineNode.CalculateBezierSplineSpoints();
-            }
-        }
-
         public void UpdateBezierCurve()
         {
             if (Next != null)
             {
-                Previous.UpdateBezierCurve();
+
+                Vector3 scale;
+                Quaternion rotation;
+                Vector3 translation;
+                Vector3 translation2;
+                Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation);
+                Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation2);
+                _splineNode = new SplineNode(Segments, translation, OutHandler, translation2, Next.InHandler);
             }
         }
 
@@ -86,7 +84,7 @@ namespace Xenko.Engine
         {
             if(_splineNode == null)
             {
-                CalculateBezierCurve();
+                UpdateBezierCurve();
             }
 
             return _splineNode;
