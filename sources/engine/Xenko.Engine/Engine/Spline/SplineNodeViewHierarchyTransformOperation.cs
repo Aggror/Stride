@@ -5,21 +5,21 @@ using System;
 namespace Xenko.Engine
 {
     /// <summary>
-    /// Updates <see cref="Engine.SplineComponent"/>.
+    /// Updates <see cref="Engine.SplineNodeComponent"/>.
     /// </summary>
-    public class SplineViewHierarchyTransformOperation : TransformOperation
+    public class SplineNodeViewHierarchyTransformOperation : TransformOperation
     {
-        public readonly SplineComponent SplineComponent;
+        public readonly SplineNodeComponent SplineNodeComponent;
 
-        public SplineViewHierarchyTransformOperation(SplineComponent modelComponent)
+        public SplineNodeViewHierarchyTransformOperation(SplineNodeComponent modelComponent)
         {
-            SplineComponent = modelComponent;
+            SplineNodeComponent = modelComponent;
         }
 
         /// <inheritdoc/>
         public override void Process(TransformComponent transformComponent)
         {
-            SplineComponent.Update(transformComponent);
+            SplineNodeComponent.Update(transformComponent);
         }
     }
 }

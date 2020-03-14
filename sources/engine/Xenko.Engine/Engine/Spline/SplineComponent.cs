@@ -1,5 +1,5 @@
-// Copyright (c) Xenko contributors (https://xenko.com) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
-// Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
+//// Copyright (c) Xenko contributors (https://xenko.com) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
+//// Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,8 @@ using Xenko.Core.Annotations;
 using Xenko.Core.Collections;
 using Xenko.Engine.Design;
 using Xenko.Engine.Processors;
+using Xenko.Games;
+using Xenko.Input;
 
 namespace Xenko.Engine
 {
@@ -23,14 +25,19 @@ namespace Xenko.Engine
     [ComponentCategory("Splines")]
     public sealed class SplineComponent : EntityComponent
     {
-        public List<SplineNodeComponent> Nodes = new List<SplineNodeComponent>();
+        private List<SplineNodeComponent> _nodes;
         public bool DebugSpline { get; set; }
         public bool DebugNodes { get; set; }
 
+
         public SplineComponent()
         {
-            CreateSplineNodeEntity();
-            CreateSplineNodeEntity();
+            //CreateSplineNodeEntity();
+            //CreateSplineNodeEntity();
+        }
+
+        internal void Initialize()
+        {
         }
 
         ///// <summary>
@@ -52,17 +59,27 @@ namespace Xenko.Engine
         internal void Update(TransformComponent transformComponent)
         {
             Console.WriteLine(Entity.Name);
+            if (DebugSpline){
+                CreateSplineNodeEntity();
+                DebugSpline = false;
+            }
         }
 
         public void CreateSplineNodeEntity()
         {
-            var nodesCount = Nodes.Count;
+            if(_nodes == null)
+            {
+                _nodes = new List<SplineNodeComponent>();
+            }
+
+            var nodesCount = _nodes.Count;
             var entityName = "Node_" + nodesCount;
-            var startPos = nodesCount > 0 ? Nodes[nodesCount - 1].Entity.Transform.Position : Entity.Transform.Position;
+            var startPos = nodesCount > 0 ? _nodes[nodesCount - 1].Entity.Transform.Position : Entity.Transform.Position;
             var entity = new Entity(startPos, entityName);
 
             var newSplineNodeComponent = entity.GetOrCreate<SplineNodeComponent>();
-            Nodes.Add(newSplineNodeComponent);
+            entity.Scene.Entities.Add(entity);
+            //Nodes.Add(newSplineNodeComponent);
         }
     }
 }
