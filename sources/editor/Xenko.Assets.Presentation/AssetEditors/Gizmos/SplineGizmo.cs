@@ -61,7 +61,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             GizmoRootEntity.Transform.Scale = 1 * scale;
             GizmoRootEntity.Transform.UpdateWorldMatrix();
 
-            if (Component.State.IsDirty)
+            if (Component.Info.IsDirty)
             {
                 ClearChildren(debugEntitySegments);
                 ClearChildren(debugEntityOrbs);
@@ -69,14 +69,14 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                 debugEntitySegments.RemoveAll<ModelComponent>();
                 debugEntityNodeLink.RemoveAll<ModelComponent>();
                 debugEntityOut.RemoveAll<ModelComponent>();
-                Component.State.IsDirty = false;
+                Component.Info.IsDirty = false;
 
-                if (Component.State.NodesLink)
+                if (Component.Info.NodesLink)
                 {
                     DebugNodeLinks();
                 }
 
-                if (Component.State.Segments || Component.State.Points)
+                if (Component.Info.Segments || Component.Info.Points)
                 {
                     var splinePointsInfo = Component.GetSplineNode().GetSplinePointInfo();
                     var splinePoints = new Vector3[splinePointsInfo.Length];
@@ -85,23 +85,23 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                         splinePoints[i] = splinePointsInfo[i].position;
                     }
 
-                    if (Component.State.Points)
+                    if (Component.Info.Points)
                     {
                         CreateSplinePoints(splinePoints);
                     }
 
-                    if (Component.State.Segments)
+                    if (Component.Info.Segments)
                     {
                         CreateSplineSegments(splinePoints);
                     }
                 }
 
-                if (Component.State.OutHandler)
+                if (Component.Info.OutHandler)
                 {
                     CreateOutHandler();
                 }
 
-                Component.State.IsDirty = false;
+                Component.Info.IsDirty = false;
             }
         }
 

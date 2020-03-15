@@ -25,12 +25,64 @@ namespace Xenko.Engine
     [ComponentCategory("Splines")]
     public sealed class SplineNodeComponent : EntityComponent
     {
-        public SplineNodeComponent Next { get; set; }
-        public SplineNodeComponent Previous { get; set; }
+        public SplineNodeInfo Info;
 
-        public Vector3 OutHandler { get; set; }
-        public Vector3 InHandler { get; set; }
+        #region PreviousNode
+        private SplineNodeComponent _next;
+        public SplineNodeComponent Next
+        {
+            get { return _next; }
+            set
+            {
+                _next = value;
+                Info.IsDirty = true;
+                Next.Previous = this;
+            }
+        }
+        #endregion
 
+        #region PreviousNode
+        private SplineNodeComponent _previous;
+        [DataMemberIgnore]
+        public SplineNodeComponent Previous
+        {
+            get { return _next; }
+            set
+            {
+                _previous = value;
+                Info.IsDirty = true;
+            }
+        }
+        #endregion
+
+        #region In
+        private Vector3 _outHandler { get; set; }
+        public Vector3 OutHandler
+        {
+            get { return _outHandler; }
+            set
+            {
+                _outHandler = value;
+                Info.IsDirty = true;
+            }
+        }
+        #endregion
+
+        #region In
+        private Vector3 _inHandler { get; set; }
+        public Vector3 InHandler
+
+        {
+            get { return _inHandler; }
+            set
+            {
+                _inHandler = value;
+                Info.IsDirty = true;
+            }
+        }
+        #endregion
+
+        #region Segments
         private int _segments = 2;
         public int Segments
         {
@@ -47,8 +99,9 @@ namespace Xenko.Engine
                 }
             }
         }
+        #endregion
 
-        public DebugSpline State;
+
         private SplineNode _splineNode;
         private Vector3 _previousVector;
 
@@ -56,16 +109,15 @@ namespace Xenko.Engine
         {
             CheckDirtyness();
 
-            if (Next != null && State.IsDirty)
+            if (Next != null && Info.IsDirty)
             {
                 UpdateBezierCurve();
             }
 
-            if (Previous != null && State.IsDirty)
+            if (Previous != null && Info.IsDirty)
             {
-                Previous.UpdateBezierCurve();
+                Previous.MakeDirty();
             }
-
 
             _previousVector = Entity.Transform.Position;
         }
@@ -76,8 +128,13 @@ namespace Xenko.Engine
                             _previousVector.Y != Entity.Transform.Position.Y ||
                             _previousVector.Z != Entity.Transform.Position.Z)
             {
-                State.IsDirty = true;
+                Info.IsDirty = true;
             }
+        }
+
+        public void MakeDirty()
+        {
+            Info.IsDirty = true;
         }
 
         public void UpdateBezierCurve()
@@ -101,7 +158,7 @@ namespace Xenko.Engine
             return _splineNode;
         }
 
-        public struct DebugSpline
+        public struct SplineNodeInfo
         {
             private bool _points;
             private bool _segments;
