@@ -48,11 +48,7 @@ namespace Xenko.Engine
             }
         }
 
-        public bool DebugSegments { get; set; }
-        public bool DebugNodesLink { get; set; }
-        public bool DebugOutHandler { get; set; }
-        public bool IsDirty { get; set; }
-
+        public DebugSpline State;
         private SplineNode _splineNode;
         private Vector3 _previousVector;
 
@@ -60,12 +56,12 @@ namespace Xenko.Engine
         {
             CheckDirtyness();
 
-            if (Next != null && IsDirty)
+            if (Next != null && State.IsDirty)
             {
                 UpdateBezierCurve();
             }
 
-            if (Previous != null && IsDirty)
+            if (Previous != null && State.IsDirty)
             {
                 Previous.UpdateBezierCurve();
             }
@@ -80,7 +76,7 @@ namespace Xenko.Engine
                             _previousVector.Y != Entity.Transform.Position.Y ||
                             _previousVector.Z != Entity.Transform.Position.Z)
             {
-                IsDirty = true;
+                State.IsDirty = true;
             }
         }
 
@@ -103,6 +99,56 @@ namespace Xenko.Engine
             }
 
             return _splineNode;
+        }
+
+        public struct DebugSpline
+        {
+            private bool _points;
+            private bool _segments;
+            private bool _out;
+            private bool _nodeLink;
+
+            public bool IsDirty { get; set; }
+
+            public bool Points
+            {
+                get { return _points; }
+                set
+                {
+                    _points = value;
+                    IsDirty = true;
+                }
+            }
+
+            public bool Segments
+            {
+                get { return _segments; }
+                set
+                {
+                    _segments = value;
+                    IsDirty = true;
+                }
+            }
+
+            public bool NodesLink
+            {
+                get { return _nodeLink; }
+                set
+                {
+                    _nodeLink = value;
+                    IsDirty = true;
+                }
+            }
+
+            public bool OutHandler
+            {
+                get { return _out; }
+                set
+                {
+                    _out = value;
+                    IsDirty = true;
+                }
+            }
         }
     }
 }

@@ -61,28 +61,47 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             GizmoRootEntity.Transform.Scale = 1 * scale;
             GizmoRootEntity.Transform.UpdateWorldMatrix();
 
-            if (Component.Next != null && Component.IsDirty)
+            if (Component.State.IsDirty)
             {
-                if (Component.DebugNodesLink)
+                ClearChildren(debugEntitySegments);
+                ClearChildren(debugEntityOrbs);
+
+                debugEntitySegments.RemoveAll<ModelComponent>();
+                debugEntityNodeLink.RemoveAll<ModelComponent>();
+                debugEntityOut.RemoveAll<ModelComponent>();
+                Component.State.IsDirty = false;
+
+                if (Component.State.NodesLink)
                 {
                     DebugNodeLinks();
                 }
 
-                if (Component.DebugSegments)
+                if (Component.State.Segments || Component.State.Points)
                 {
                     var splinePointsInfo = Component.GetSplineNode().GetSplinePointInfo();
                     var splinePoints = new Vector3[splinePointsInfo.Length];
+                    for (int i = 0; i < splinePointsInfo.Length; i++)
+                    {
+                        splinePoints[i] = splinePointsInfo[i].position;
+                    }
 
-                    CreateSplineOrbs(splinePoints);
-                    CreateSplineSegments(splinePoints);
+                    if (Component.State.Points)
+                    {
+                        CreateSplinePoints(splinePoints);
+                    }
+
+                    if (Component.State.Segments)
+                    {
+                        CreateSplineSegments(splinePoints);
+                    }
                 }
 
-                if (Component.DebugOutHandler)
+                if (Component.State.OutHandler)
                 {
                     CreateOutHandler();
                 }
 
-                Component.IsDirty = false;
+                Component.State.IsDirty = false;
             }
         }
 
@@ -102,15 +121,41 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                     RenderGroup = RenderGroup
                 }
             );
+
+            //var color = new Color[7];
+            //color[0] = Color.Red;
+            //color[1] = Color.Green;
+            //color[2] = Color.Yellow;
+            //color[3] = Color.Purple;
+            //color[4] = Color.Blue;
+            //color[5] = Color.Orange;
+            //color[6] = Color.Pink;
+
+            //var rand = new Random();
+            //for (int i = 0; i < splinePoints.Length - 1; i++)
+            //{
+            //    var lineMesh = new LineMesh(GraphicsDevice);
+            //    lineMesh.Build(new Vector3[2] { splinePoints[i], splinePoints[i + 1] });
+
+            //    var segment = new Entity()
+            //    {
+            //        new ModelComponent
+            //        {
+            //            Model = new Model
+            //            {
+            //                GizmoUniformColorMaterial.Create(GraphicsDevice, color[rand.Next(0, color.Length)]),
+            //                new Mesh { Draw = lineMesh.MeshDraw }
+            //            },
+            //            RenderGroup = RenderGroup,
+            //        }
+            //    };
+            //    segment.Transform.Position = splinePoints[i];
+            //    debugEntitySegments.AddChild(segment);
+            //}
         }
 
-        private void CreateSplineOrbs(Vector3[] splinePoints)
+        private void CreateSplinePoints(Vector3[] splinePoints)
         {
-            var children = debugEntityOrbs.GetChildren();
-            foreach (var child in children)
-            {
-                debugEntityOrbs.RemoveChild(child);
-            }
             for (int i = 0; i < splinePoints.Length; i++)
             {
                 var pointMesh = new LightPointMesh(GraphicsDevice);
@@ -137,14 +182,13 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
         {
             var nodeLinkLineMesh = new LineMesh(GraphicsDevice);
             nodeLinkLineMesh.Build(new Vector3[2] { Component.Entity.Transform.Position, Component.Next.Entity.Transform.Position - Component.Entity.Transform.Position });
-
             debugEntityNodeLink.RemoveAll<ModelComponent>();
             debugEntityNodeLink.Add(
                 new ModelComponent
                 {
                     Model = new Model
                     {
-                            GizmoUniformColorMaterial.Create(GraphicsDevice, Color.MediumOrchid),
+                            GizmoUniformColorMaterial.Create(GraphicsDevice, Color.Green),
                             new Mesh { Draw = nodeLinkLineMesh.MeshDraw }
                     },
                     RenderGroup = RenderGroup
@@ -154,12 +198,10 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
         private void CreateOutHandler()
         {
-
             var outMesh = new LightPointMesh(GraphicsDevice);
             outMesh.Build();
 
             debugEntityOut.Transform.Position = Component.OutHandler;
-            debugEntityOut.RemoveAll<ModelComponent>();
             debugEntityOut.Add(
                 new ModelComponent
                 {
@@ -279,5 +321,15 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                 };
             }
         }
+
+        private void ClearChildren(Entity entity)
+        {
+            var children = entity.GetChildren();
+            foreach (var child in children)
+            {
+                entity.RemoveChild(child);
+            }
+        }
+
     }
 }
