@@ -50,39 +50,54 @@ namespace Xenko.Engine
 
         public bool DebugSegments { get; set; }
         public bool DebugNodesLink { get; set; }
+        public bool DebugOutHandler { get; set; }
+        public bool IsDirty { get; set; }
 
         private SplineNode _splineNode;
-        private bool _calculateSubNodes = true;
-
+        private Vector3 _previousVector;
 
         internal void Update(TransformComponent transformComponent)
         {
-            UpdateBezierCurve();
-            
-            if (Previous != null)
+            CheckDirtyness();
+
+            if (Next != null && IsDirty)
+            {
+                UpdateBezierCurve();
+            }
+
+            if (Previous != null && IsDirty)
             {
                 Previous.UpdateBezierCurve();
-            }  
+            }
+
+
+            _previousVector = Entity.Transform.Position;
+        }
+
+        private void CheckDirtyness()
+        {
+            if (_previousVector.X != Entity.Transform.Position.X ||
+                            _previousVector.Y != Entity.Transform.Position.Y ||
+                            _previousVector.Z != Entity.Transform.Position.Z)
+            {
+                IsDirty = true;
+            }
         }
 
         public void UpdateBezierCurve()
         {
-            if (Next != null)
-            {
-
-                Vector3 scale;
-                Quaternion rotation;
-                Vector3 translation;
-                Vector3 translation2;
-                Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation);
-                Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation2);
-                _splineNode = new SplineNode(Segments, translation, OutHandler, translation2, Next.InHandler);
-            }
+            Vector3 scale;
+            Quaternion rotation;
+            Vector3 translation;
+            Vector3 translation2;
+            Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation);
+            Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation2);
+            _splineNode = new SplineNode(Segments, translation, OutHandler, translation2, Next.InHandler);
         }
 
         public SplineNode GetSplineNode()
         {
-            if(_splineNode == null)
+            if (_splineNode == null)
             {
                 UpdateBezierCurve();
             }
