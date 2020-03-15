@@ -21,13 +21,13 @@ namespace Xenko.Engine
 
     [DataContract]
     [DefaultEntityComponentProcessor(typeof(SplineNodeTransformProcessor), ExecutionMode = ExecutionMode.All)]
-    [Display("spline node")]
+    [Display("Spline node")]
     [ComponentCategory("Splines")]
     public sealed class SplineNodeComponent : EntityComponent
     {
         public SplineNodeInfo Info;
 
-        #region PreviousNode
+        #region NextNode
         private SplineNodeComponent _next;
         public SplineNodeComponent Next
         {
@@ -35,8 +35,12 @@ namespace Xenko.Engine
             set
             {
                 _next = value;
-                Info.IsDirty = true;
-                Next.Previous = this;
+
+                if (_next != null)
+                {
+                    Info.IsDirty = true;
+                    _next.Previous = this;
+                }
             }
         }
         #endregion
@@ -46,7 +50,7 @@ namespace Xenko.Engine
         [DataMemberIgnore]
         public SplineNodeComponent Previous
         {
-            get { return _next; }
+            get { return _previous; }
             set
             {
                 _previous = value;
@@ -165,6 +169,7 @@ namespace Xenko.Engine
             private bool _out;
             private bool _nodeLink;
 
+            [DataMemberIgnore]
             public bool IsDirty { get; set; }
 
             public bool Points
