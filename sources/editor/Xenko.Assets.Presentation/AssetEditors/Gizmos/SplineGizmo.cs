@@ -102,56 +102,67 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                 }
 
                 Component.Info.IsDirty = false;
+
+                debugEntityOrbs.Transform.UpdateWorldMatrix();
+                debugEntitySegments.Transform.UpdateWorldMatrix();
+                debugEntity.Transform.UpdateWorldMatrix();
             }
         }
 
         private void CreateSplineSegments(Vector3[] splinePoints)
         {
-            var bezierSegmentsMesh = new LineMesh(GraphicsDevice);
-            bezierSegmentsMesh.Build(splinePoints);
-            debugEntitySegments.RemoveAll<ModelComponent>();
-            debugEntitySegments.Add(
-                new ModelComponent
-                {
-                    Model = new Model
-                    {
-                            GizmoUniformColorMaterial.Create(GraphicsDevice, Color.Orange),
-                            new Mesh { Draw = bezierSegmentsMesh.MeshDraw }
-                    },
-                    RenderGroup = RenderGroup
-                }
-            );
-
-            //var color = new Color[7];
-            //color[0] = Color.Red;
-            //color[1] = Color.Green;
-            //color[2] = Color.Yellow;
-            //color[3] = Color.Purple;
-            //color[4] = Color.Blue;
-            //color[5] = Color.Orange;
-            //color[6] = Color.Pink;
-
-            //var rand = new Random();
             //for (int i = 0; i < splinePoints.Length - 1; i++)
             //{
-            //    var lineMesh = new LineMesh(GraphicsDevice);
-            //    lineMesh.Build(new Vector3[2] { splinePoints[i], splinePoints[i + 1] });
-
-            //    var segment = new Entity()
-            //    {
-            //        new ModelComponent
-            //        {
-            //            Model = new Model
-            //            {
-            //                GizmoUniformColorMaterial.Create(GraphicsDevice, color[rand.Next(0, color.Length)]),
-            //                new Mesh { Draw = lineMesh.MeshDraw }
-            //            },
-            //            RenderGroup = RenderGroup,
-            //        }
-            //    };
-            //    segment.Transform.Position = splinePoints[i];
-            //    debugEntitySegments.AddChild(segment);
+            //    Console.WriteLine(splinePoints[i]);
             //}
+
+            //var bezierSegmentsMesh = new LineMesh(GraphicsDevice);
+            //bezierSegmentsMesh.Build(splinePoints);
+            //debugEntitySegments.RemoveAll<ModelComponent>();
+            //debugEntitySegments.Add(
+            //    new ModelComponent
+            //    {
+            //        Model = new Model
+            //        {
+            //                GizmoUniformColorMaterial.Create(GraphicsDevice, Color.Orange),
+            //                new Mesh { Draw = bezierSegmentsMesh.MeshDraw }
+            //        },
+            //        RenderGroup = RenderGroup
+            //    }
+            //);
+
+            var color = new Color[7];
+            color[0] = Color.Red;
+            color[1] = Color.Green;
+            color[2] = Color.Yellow;
+            color[3] = Color.Purple;
+            color[4] = Color.Blue;
+            color[5] = Color.Orange;
+            color[6] = Color.Pink;
+
+            var rand = new Random();
+            for (int i = 0; i < splinePoints.Length - 1; i++)
+            {
+                var lineMesh = new LineMesh(GraphicsDevice);
+                lineMesh.Build(new Vector3[2] { splinePoints[i], splinePoints[i + 1] });
+
+                var segment = new Entity()
+                {
+                    new ModelComponent
+                    {
+                        Model = new Model
+                        {
+                            GizmoUniformColorMaterial.Create(GraphicsDevice, color[rand.Next(0, color.Length)]),
+                            new Mesh { Draw = lineMesh.MeshDraw }
+                        },
+                        RenderGroup = RenderGroup,
+                    }
+                };
+
+                var pos = debugEntity.Transform.WorldMatrix.TranslationVector - splinePoints[i];
+                segment.Transform.Position = pos;
+                debugEntitySegments.AddChild(segment);
+            }
         }
 
         private void CreateSplinePoints(Vector3[] splinePoints)
@@ -173,7 +184,9 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                         RenderGroup = RenderGroup,
                     }
                 };
-                orb.Transform.Position = splinePoints[i];
+
+                var pos = debugEntity.Transform.WorldMatrix.TranslationVector + splinePoints[i];
+                orb.Transform.Position = pos;
                 debugEntityOrbs.AddChild(orb);
             }
         }

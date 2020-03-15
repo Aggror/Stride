@@ -58,7 +58,7 @@ namespace Xenko.Engine.Spline
             //var oriPivot = Pivot:Create();
             //var targetPivot = Pivot:Create();
 
-            float t = 1.0f / _nodesCount;
+            float t = 1.0f / _segments;
             for (var i = 0; i < _nodesCount; i++)
             {
                 var p = CalculateBezierPoint(t * (i));
