@@ -169,6 +169,8 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
         private void CreateSplinePoints(Vector3[] splinePoints)
         {
+            ClearChildren(debugEntityOrbs);
+
             for (int i = 0; i < splinePoints.Length; i++)
             {
                 var pointMesh = new LightPointMesh(GraphicsDevice);
