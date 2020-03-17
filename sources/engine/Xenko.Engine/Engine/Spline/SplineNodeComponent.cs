@@ -59,7 +59,7 @@ namespace Xenko.Engine
         }
         #endregion
 
-        #region In
+        #region Out
         private Vector3 _outHandler { get; set; }
         public Vector3 OutHandler
         {
@@ -101,10 +101,10 @@ namespace Xenko.Engine
                 {
                     _segments = value;
                 }
+                Info.IsDirty = true;
             }
         }
         #endregion
-
 
         private SplineNode _splineNode;
         private Vector3 _previousVector;
@@ -129,8 +129,8 @@ namespace Xenko.Engine
         private void CheckDirtyness()
         {
             if (_previousVector.X != Entity.Transform.Position.X ||
-                            _previousVector.Y != Entity.Transform.Position.Y ||
-                            _previousVector.Z != Entity.Transform.Position.Z)
+                    _previousVector.Y != Entity.Transform.Position.Y ||
+                    _previousVector.Z != Entity.Transform.Position.Z)
             {
                 Info.IsDirty = true;
             }
@@ -145,11 +145,11 @@ namespace Xenko.Engine
         {
             Vector3 scale;
             Quaternion rotation;
-            Vector3 translation;
-            Vector3 translation2;
-            Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation);
-            Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation2);
-            _splineNode = new SplineNode(Segments, translation, OutHandler, translation2, Next.InHandler);
+            Vector3 entityWorldPos;
+            Vector3 nextWorldPos;
+            Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out entityWorldPos);
+            Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out nextWorldPos);
+            _splineNode = new SplineNode(Segments, entityWorldPos, OutHandler, nextWorldPos, Next.InHandler);
         }
 
         public SplineNode GetSplineNode()
@@ -167,6 +167,7 @@ namespace Xenko.Engine
             private bool _points;
             private bool _segments;
             private bool _out;
+            private bool _in;
             private bool _nodeLink;
 
             [DataMemberIgnore]
@@ -208,6 +209,16 @@ namespace Xenko.Engine
                 set
                 {
                     _out = value;
+                    IsDirty = true;
+                }
+            }
+
+            public bool InHandler
+            {
+                get { return _in; }
+                set
+                {
+                    _in = value;
                     IsDirty = true;
                 }
             }

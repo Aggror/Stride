@@ -1,6 +1,7 @@
 // Copyright (c) Xenko contributors (https://xenko.com) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
 using System;
+using System.Collections.Generic;
 using Xenko.Core;
 using Xenko.Core.Mathematics;
 using Xenko.Engine;
@@ -25,6 +26,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
         private Entity debugEntitySegments;
         private Entity debugEntityOrbs;
         private Entity debugEntityOut;
+        private Entity debugEntityIn;
 
         public SplineGizmo(EntityComponent component) : base(component)
         {
@@ -37,10 +39,12 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             debugEntitySegments = new Entity();
             debugEntityOrbs = new Entity();
             debugEntityOut = new Entity();
+            debugEntityIn = new Entity();
             debugEntity.AddChild(debugEntityNodeLink);
             debugEntity.AddChild(debugEntitySegments);
             debugEntity.AddChild(debugEntityOrbs);
             debugEntity.AddChild(debugEntityOut);
+            debugEntity.AddChild(debugEntityIn);
             return debugEntity;
         }
 
@@ -69,6 +73,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                 debugEntitySegments.RemoveAll<ModelComponent>();
                 debugEntityNodeLink.RemoveAll<ModelComponent>();
                 debugEntityOut.RemoveAll<ModelComponent>();
+                debugEntityIn.RemoveAll<ModelComponent>();
                 Component.Info.IsDirty = false;
 
                 if (Component.Info.NodesLink)
@@ -101,23 +106,23 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                     CreateOutHandler();
                 }
 
-                Component.Info.IsDirty = false;
-
-                debugEntityOrbs.Transform.UpdateWorldMatrix();
-                debugEntitySegments.Transform.UpdateWorldMatrix();
-                debugEntity.Transform.UpdateWorldMatrix();
+                if (Component.Info.InHandler)
+                {
+                    CreateInHandler();
+                }
             }
         }
 
         private void CreateSplineSegments(Vector3[] splinePoints)
         {
+            //var localPoints = new Vector3[splinePoints.Length];
             //for (int i = 0; i < splinePoints.Length - 1; i++)
             //{
-            //    Console.WriteLine(splinePoints[i]);
+            //    localPoints[i] = debugEntity.Transform.WorldToLocal(splinePoints[i]);
             //}
 
             //var bezierSegmentsMesh = new LineMesh(GraphicsDevice);
-            //bezierSegmentsMesh.Build(splinePoints);
+            //bezierSegmentsMesh.Build(localPoints);
             //debugEntitySegments.RemoveAll<ModelComponent>();
             //debugEntitySegments.Add(
             //    new ModelComponent
@@ -131,20 +136,18 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             //    }
             //);
 
-            var color = new Color[7];
-            color[0] = Color.Red;
-            color[1] = Color.Green;
-            color[2] = Color.Yellow;
-            color[3] = Color.Purple;
-            color[4] = Color.Blue;
-            color[5] = Color.Orange;
-            color[6] = Color.Pink;
+            ClearChildren(debugEntitySegments);
 
-            var rand = new Random();
-            for (int i = 0; i < splinePoints.Length - 1; i++)
+            var localPoints = new Vector3[splinePoints.Length];
+            for (int i = 0; i < splinePoints.Length; i++)
+            {
+                localPoints[i] = debugEntity.Transform.WorldToLocal(splinePoints[i]);
+            }
+
+            for (int i = 0; i < localPoints.Length - 1; i++)
             {
                 var lineMesh = new LineMesh(GraphicsDevice);
-                lineMesh.Build(new Vector3[2] { splinePoints[i], splinePoints[i + 1] });
+                lineMesh.Build(new Vector3[2] { localPoints[i], localPoints[i + 1] });
 
                 var segment = new Entity()
                 {
@@ -152,16 +155,15 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                     {
                         Model = new Model
                         {
-                            GizmoUniformColorMaterial.Create(GraphicsDevice, color[rand.Next(0, color.Length)]),
+                            GizmoUniformColorMaterial.Create(GraphicsDevice, i % 2 == 0 ? Color.Orange: Color.OrangeRed),
                             new Mesh { Draw = lineMesh.MeshDraw }
                         },
                         RenderGroup = RenderGroup,
                     }
                 };
 
-                var pos = debugEntity.Transform.WorldMatrix.TranslationVector - splinePoints[i];
-                segment.Transform.Position = pos;
                 debugEntitySegments.AddChild(segment);
+                segment.Transform.Position = debugEntity.Transform.WorldToLocal(splinePoints[i]);
             }
         }
 
@@ -178,16 +180,15 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                     {
                         Model = new Model
                         {
-                            GizmoUniformColorMaterial.Create(GraphicsDevice, Color.AliceBlue),
+                            GizmoUniformColorMaterial.Create(GraphicsDevice, Color.PeachPuff),
                             new Mesh { Draw = pointMesh.MeshDraw }
                         },
                         RenderGroup = RenderGroup,
                     }
                 };
 
-                var pos = debugEntity.Transform.WorldMatrix.TranslationVector + splinePoints[i];
-                orb.Transform.Position = pos;
                 debugEntityOrbs.AddChild(orb);
+                orb.Transform.Position = debugEntity.Transform.WorldToLocal(splinePoints[i]);
             }
         }
 
@@ -222,6 +223,25 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                     {
                                 GizmoUniformColorMaterial.Create(GraphicsDevice, Color.LightSeaGreen),
                                 new Mesh { Draw = outMesh.MeshDraw }
+                    },
+                    RenderGroup = RenderGroup
+                }
+            );
+        }
+
+        private void CreateInHandler()
+        {
+            var inMesh = new LightPointMesh(GraphicsDevice);
+            inMesh.Build();
+
+            debugEntityIn.Transform.Position = Component.InHandler;
+            debugEntityIn.Add(
+                new ModelComponent
+                {
+                    Model = new Model
+                    {
+                                GizmoUniformColorMaterial.Create(GraphicsDevice, Color.DeepPink),
+                                new Mesh { Draw = inMesh.MeshDraw }
                     },
                     RenderGroup = RenderGroup
                 }
@@ -310,7 +330,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                         var longitude = (float)(i * 2.0 * Math.PI / Tesselation);
                         var dx = (float)Math.Cos(longitude);
                         var dy = (float)Math.Sin(longitude);
-                        var range = 0.5f;
+                        var range = 0.4f;
                         var normal = new Vector3(dx * range, dy * range, 0);
                         Vector3.TransformNormal(ref normal, ref rotation, out normal);
 
