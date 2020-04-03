@@ -19,7 +19,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
     /// this gizmo uses scale as the extent of the bounding box and is not affected by rotation
     /// </summary>
     [GizmoComponent(typeof(SplineNodeComponent), false)]
-    public class SplineGizmo : EntityGizmo<SplineNodeComponent>
+    public class SplineNodeGizmo : EntityGizmo<SplineNodeComponent>
     {
         private Entity debugEntity;
         private Entity debugEntityNodeLink;
@@ -27,8 +27,10 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
         private Entity debugEntityOrbs;
         private Entity debugEntityOut;
         private Entity debugEntityIn;
+        private float updateFrequency = 0.2f;
+        private float updateTimer = 0.2f;
 
-        public SplineGizmo(EntityComponent component) : base(component)
+        public SplineNodeGizmo(EntityComponent component) : base(component)
         {
         }
 
@@ -50,8 +52,16 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
         public override void Update()
         {
+            updateTimer += (float)Game.UpdateTime.Elapsed.TotalSeconds;
+
             if (ContentEntity == null || GizmoRootEntity == null)
                 return;
+
+            if (updateTimer > updateFrequency)
+            {
+                updateTimer = 0;
+                return;
+            }
 
             // calculate the world matrix of the gizmo so that it is positioned exactly as the corresponding scene entity
             // except the scale that is re-adjusted to the gizmo desired size (gizmo are insert at scene root so LocalMatrix = WorldMatrix)
@@ -65,7 +75,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             GizmoRootEntity.Transform.Scale = 1 * scale;
             GizmoRootEntity.Transform.UpdateWorldMatrix();
 
-            if (Component.Info.IsDirty)
+            if (Component.Info.IsDirty && Component.Next != null)
             {
                 ClearChildren(debugEntitySegments);
                 ClearChildren(debugEntityOrbs);

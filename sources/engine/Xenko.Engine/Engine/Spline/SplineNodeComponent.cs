@@ -25,7 +25,7 @@ namespace Xenko.Engine
     [ComponentCategory("Splines")]
     public sealed class SplineNodeComponent : EntityComponent
     {
-        public SplineNodeInfo Info;
+        public SplineDebugInfo Info;
 
         #region NextNode
         private SplineNodeComponent _next;
@@ -143,85 +143,26 @@ namespace Xenko.Engine
 
         public void UpdateBezierCurve()
         {
-            Vector3 scale;
-            Quaternion rotation;
-            Vector3 entityWorldPos;
-            Vector3 nextWorldPos;
-            Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out entityWorldPos);
-            Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out nextWorldPos);
-            _splineNode = new SplineNode(Segments, entityWorldPos, OutHandler, nextWorldPos, Next.InHandler);
+            if (Next != null)
+            {
+                Vector3 scale;
+                Quaternion rotation;
+                Vector3 entityWorldPos;
+                Vector3 nextWorldPos;
+                Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out entityWorldPos);
+                Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out nextWorldPos);
+                _splineNode = new SplineNode(Segments, entityWorldPos, OutHandler, nextWorldPos, Next.InHandler);
+            }
         }
 
         public SplineNode GetSplineNode()
         {
-            if (_splineNode == null)
+            if (_splineNode == null && Next != null)
             {
                 UpdateBezierCurve();
             }
 
             return _splineNode;
-        }
-
-        public struct SplineNodeInfo
-        {
-            private bool _points;
-            private bool _segments;
-            private bool _out;
-            private bool _in;
-            private bool _nodeLink;
-
-            [DataMemberIgnore]
-            public bool IsDirty { get; set; }
-
-            public bool Points
-            {
-                get { return _points; }
-                set
-                {
-                    _points = value;
-                    IsDirty = true;
-                }
-            }
-
-            public bool Segments
-            {
-                get { return _segments; }
-                set
-                {
-                    _segments = value;
-                    IsDirty = true;
-                }
-            }
-
-            public bool NodesLink
-            {
-                get { return _nodeLink; }
-                set
-                {
-                    _nodeLink = value;
-                    IsDirty = true;
-                }
-            }
-
-            public bool OutHandler
-            {
-                get { return _out; }
-                set
-                {
-                    _out = value;
-                    IsDirty = true;
-                }
-            }
-
-            public bool InHandler
-            {
-                get { return _in; }
-                set
-                {
-                    _in = value;
-                    IsDirty = true;
-                }
-            }
         }
     }
 }

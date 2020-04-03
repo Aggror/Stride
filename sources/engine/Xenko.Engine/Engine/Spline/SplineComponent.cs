@@ -3,16 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using Xenko.Audio;
 using Xenko.Core;
-using Xenko.Core.Annotations;
-using Xenko.Core.Collections;
 using Xenko.Engine.Design;
 using Xenko.Engine.Processors;
-using Xenko.Games;
-using Xenko.Input;
+using Xenko.Engine.Spline;
 
 namespace Xenko.Engine
 {
@@ -26,8 +20,8 @@ namespace Xenko.Engine
     public sealed class SplineComponent : EntityComponent
     {
         private List<SplineNodeComponent> _nodes;
-        public bool DebugSpline { get; set; }
-        public bool DebugNodes { get; set; }
+        public SplineDebugInfo DebugInfo;
+        public bool CreateSplineNode;
 
 
         public SplineComponent()
@@ -59,9 +53,10 @@ namespace Xenko.Engine
         internal void Update(TransformComponent transformComponent)
         {
             Console.WriteLine(Entity.Name);
-            if (DebugSpline){
+            if (CreateSplineNode)
+            {
                 CreateSplineNodeEntity();
-                DebugSpline = false;
+                CreateSplineNode = false;
             }
         }
 
