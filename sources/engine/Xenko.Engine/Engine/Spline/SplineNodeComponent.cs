@@ -21,11 +21,11 @@ namespace Xenko.Engine
 
     [DataContract]
     [DefaultEntityComponentProcessor(typeof(SplineNodeTransformProcessor), ExecutionMode = ExecutionMode.All)]
-    [Display("Spline node")]
+    [Display("Spline node", Expand = ExpandRule.Once)]
     [ComponentCategory("Splines")]
     public sealed class SplineNodeComponent : EntityComponent
     {
-        public SplineDebugInfo Info;
+        public bool Dirty { get; private set; }
 
         #region NextNode
         private SplineNodeComponent _next;
@@ -38,7 +38,7 @@ namespace Xenko.Engine
 
                 if (_next != null)
                 {
-                    Info.IsDirty = true;
+                    Dirty = true;
                     _next.Previous = this;
                 }
             }
@@ -54,34 +54,34 @@ namespace Xenko.Engine
             set
             {
                 _previous = value;
-                Info.IsDirty = true;
+                Dirty = true;
             }
         }
         #endregion
 
         #region Out
-        private Vector3 _outHandler { get; set; }
-        public Vector3 OutHandler
+        private Vector3 _tangentOut { get; set; }
+        public Vector3 TangentOut
         {
-            get { return _outHandler; }
+            get { return _tangentOut; }
             set
             {
-                _outHandler = value;
-                Info.IsDirty = true;
+                _tangentOut = value;
+                Dirty = true;
             }
         }
         #endregion
 
         #region In
-        private Vector3 _inHandler { get; set; }
-        public Vector3 InHandler
+        private Vector3 _TangentIn { get; set; }
+        public Vector3 TangentIn
 
         {
-            get { return _inHandler; }
+            get { return _TangentIn; }
             set
             {
-                _inHandler = value;
-                Info.IsDirty = true;
+                _TangentIn = value;
+                Dirty = true;
             }
         }
         #endregion
@@ -101,7 +101,7 @@ namespace Xenko.Engine
                 {
                     _segments = value;
                 }
-                Info.IsDirty = true;
+                Dirty = true;
             }
         }
         #endregion
@@ -113,12 +113,12 @@ namespace Xenko.Engine
         {
             CheckDirtyness();
 
-            if (Next != null && Info.IsDirty)
+            if (Next != null && Dirty)
             {
                 UpdateBezierCurve();
             }
 
-            if (Previous != null && Info.IsDirty)
+            if (Previous != null && Dirty)
             {
                 Previous.MakeDirty();
             }
@@ -132,13 +132,18 @@ namespace Xenko.Engine
                     _previousVector.Y != Entity.Transform.Position.Y ||
                     _previousVector.Z != Entity.Transform.Position.Z)
             {
-                Info.IsDirty = true;
+                Dirty = true;
             }
         }
 
         public void MakeDirty()
         {
-            Info.IsDirty = true;
+            Dirty = true;
+        }
+
+        public void MakeClean()
+        {
+            Dirty = false;
         }
 
         public void UpdateBezierCurve()
@@ -149,9 +154,14 @@ namespace Xenko.Engine
                 Quaternion rotation;
                 Vector3 entityWorldPos;
                 Vector3 nextWorldPos;
+
+
                 Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out entityWorldPos);
                 Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out nextWorldPos);
-                _splineNode = new SplineNode(Segments, entityWorldPos, OutHandler, nextWorldPos, Next.InHandler);
+                Vector3 TangentOutWorld = entityWorldPos + TangentOut;
+                Vector3 TangentInWorld = nextWorldPos + Next.TangentIn;
+
+                _splineNode = new SplineNode(Segments, entityWorldPos, TangentOutWorld, nextWorldPos, TangentInWorld);
             }
         }
 

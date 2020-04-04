@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -150,6 +150,9 @@
   </data>
   <data name="SkyboxLightGizmo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\Resources\Gizmos\SkyboxLightGizmo.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="SplineGizmo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\Resources\Gizmos\SplineGizmo.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SpotLightGizmo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\Resources\Gizmos\SpotLightGizmo.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

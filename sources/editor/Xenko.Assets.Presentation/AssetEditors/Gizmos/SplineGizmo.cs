@@ -1,15 +1,10 @@
 // Copyright (c) Xenko contributors (https://xenko.com) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
 using System;
-using System.Collections.Generic;
-using Xenko.Core;
 using Xenko.Core.Mathematics;
 using Xenko.Engine;
-using Xenko.Engine.Spline;
 using Xenko.Graphics;
-using Xenko.Navigation;
 using Xenko.Rendering;
-using Xenko.Rendering.Lights;
 using Buffer = Xenko.Graphics.Buffer;
 
 namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
@@ -18,10 +13,11 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
     /// A gizmo to display the bounding boxes for navigation meshes inside the editor as a gizmo. 
     /// this gizmo uses scale as the extent of the bounding box and is not affected by rotation
     /// </summary>
-    [GizmoComponent(typeof(SplineNodeComponent), false)]
-    public class SplineNodeGizmo : EntityGizmo<SplineNodeComponent>
+    [GizmoComponent(typeof(SplineComponent), false)]
+    public class SplineGizmo : BillboardingGizmo<SplineComponent>
     {
         private Entity debugEntity;
+        private Entity debugEntityNodes;
         private Entity debugEntityNodeLink;
         private Entity debugEntitySegments;
         private Entity debugEntityOrbs;
@@ -30,18 +26,22 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
         private float updateFrequency = 0.2f;
         private float updateTimer = 0.2f;
 
-        public SplineNodeGizmo(EntityComponent component) : base(component)
+        //TODO per node
+
+        public SplineGizmo(EntityComponent component) : base(component, "Spline gizmo", GizmoResources.SplineGizmo)
         {
         }
 
         protected override Entity Create()
         {
             debugEntity = new Entity();
+            debugEntityNodes = new Entity();
             debugEntityNodeLink = new Entity();
             debugEntitySegments = new Entity();
             debugEntityOrbs = new Entity();
             debugEntityOut = new Entity();
             debugEntityIn = new Entity();
+            debugEntity.AddChild(debugEntityNodes);
             debugEntity.AddChild(debugEntityNodeLink);
             debugEntity.AddChild(debugEntitySegments);
             debugEntity.AddChild(debugEntityOrbs);
@@ -52,75 +52,98 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
         public override void Update()
         {
-            //updateTimer += (float)Game.UpdateTime.Elapsed.TotalSeconds;
+            updateTimer += (float)Game.UpdateTime.Elapsed.TotalSeconds;
 
-            //if (ContentEntity == null || GizmoRootEntity == null)
-            //    return;
+            if (ContentEntity == null || GizmoRootEntity == null)
+                return;
 
-            //if (updateTimer > updateFrequency)
-            //{
-            //    updateTimer = 0;
-            //    return;
-            //}
+            if (updateTimer > updateFrequency)
+            {
+                updateTimer = 0;
+                return;
+            }
 
-            //// calculate the world matrix of the gizmo so that it is positioned exactly as the corresponding scene entity
-            //// except the scale that is re-adjusted to the gizmo desired size (gizmo are insert at scene root so LocalMatrix = WorldMatrix)
-            //Vector3 scale;
-            //Quaternion rotation;
-            //Vector3 translation;
-            //ContentEntity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation);
+            // calculate the world matrix of the gizmo so that it is positioned exactly as the corresponding scene entity
+            // except the scale that is re-adjusted to the gizmo desired size (gizmo are insert at scene root so LocalMatrix = WorldMatrix)
+            Vector3 scale;
+            Quaternion rotation;
+            Vector3 translation;
+            ContentEntity.Transform.WorldMatrix.Decompose(out scale, out rotation, out translation);
 
-            //// Translation and Scale but no rotation on bounding boxes
-            //GizmoRootEntity.Transform.Position = translation;
-            //GizmoRootEntity.Transform.Scale = 1 * scale;
-            //GizmoRootEntity.Transform.UpdateWorldMatrix();
+            // Translation and Scale but no rotation on bounding boxes
+            GizmoRootEntity.Transform.Position = translation;
+            GizmoRootEntity.Transform.Scale = 1 * scale;
+            GizmoRootEntity.Transform.UpdateWorldMatrix();
 
-            //if (Component.Info.IsDirty && Component.Next != null)
-            //{
-            //    ClearChildren(debugEntitySegments);
-            //    ClearChildren(debugEntityOrbs);
+            if (Component.Nodes?.Count > 1)
+            {
+                foreach (var node in Component.Nodes)
+                {
+                    if (node == null || !node.Dirty)
+                    {
+                        break;
+                    }
 
-            //    debugEntitySegments.RemoveAll<ModelComponent>();
-            //    debugEntityNodeLink.RemoveAll<ModelComponent>();
-            //    debugEntityOut.RemoveAll<ModelComponent>();
-            //    debugEntityIn.RemoveAll<ModelComponent>();
-            //    Component.Info.IsDirty = false;
+                    debugEntityNodes.RemoveAll<ModelComponent>();
 
-            //    if (Component.Info.NodesLink)
-            //    {
-            //        DebugNodeLinks();
-            //    }
+                    if (Component.DebugInfo.Nodes)
+                    {
+                        DebugNodes(node);
+                    }
 
-            //    if (Component.Info.Segments || Component.Info.Points)
-            //    {
-            //        var splinePointsInfo = Component.GetSplineNode().GetSplinePointInfo();
-            //        var splinePoints = new Vector3[splinePointsInfo.Length];
-            //        for (int i = 0; i < splinePointsInfo.Length; i++)
-            //        {
-            //            splinePoints[i] = splinePointsInfo[i].position;
-            //        }
 
-            //        if (Component.Info.Points)
-            //        {
-            //            CreateSplinePoints(splinePoints);
-            //        }
+                    if (node.Next == null)
+                    {
+                        break;
+                    }
 
-            //        if (Component.Info.Segments)
-            //        {
-            //            CreateSplineSegments(splinePoints);
-            //        }
-            //    }
+                    ClearChildren(debugEntitySegments);
+                    ClearChildren(debugEntityOrbs);
 
-            //    if (Component.Info.OutHandler)
-            //    {
-            //        CreateOutHandler();
-            //    }
+                    debugEntitySegments.RemoveAll<ModelComponent>();
+                    debugEntityNodeLink.RemoveAll<ModelComponent>();
+                    debugEntityOut.RemoveAll<ModelComponent>();
+                    debugEntityIn.RemoveAll<ModelComponent>();
+                    node.MakeClean();
 
-            //    if (Component.Info.InHandler)
-            //    {
-            //        CreateInHandler();
-            //    }
-            //}
+
+
+                    if (Component.DebugInfo.NodesLink)
+                    {
+                        DebugNodeLinks(node);
+                    }
+
+                    if (Component.DebugInfo.Segments || Component.DebugInfo.Points)
+                    {
+                        var splinePointsInfo = node.GetSplineNode().GetSplinePointInfo();
+                        var splinePoints = new Vector3[splinePointsInfo.Length];
+                        for (int i = 0; i < splinePointsInfo.Length; i++)
+                        {
+                            splinePoints[i] = splinePointsInfo[i].position;
+                        }
+
+                        if (Component.DebugInfo.Points)
+                        {
+                            CreateSplinePoints(splinePoints);
+                        }
+
+                        if (Component.DebugInfo.Segments)
+                        {
+                            CreateSplineSegments(splinePoints);
+                        }
+                    }
+
+                    if (Component.DebugInfo.OutHandler)
+                    {
+                        CreateOutHandler(node);
+                    }
+
+                    if (Component.DebugInfo.InHandler)
+                    {
+                        CreateInHandler(node);
+                    }
+                }
+            }
         }
 
         private void CreateSplineSegments(Vector3[] splinePoints)
@@ -183,7 +206,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
             for (int i = 0; i < splinePoints.Length; i++)
             {
-                var pointMesh = new LightPointMesh(GraphicsDevice);
+                var pointMesh = new BulbMesh(GraphicsDevice, 0.2f);
                 pointMesh.Build();
 
                 var orb = new Entity()
@@ -204,10 +227,31 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             }
         }
 
-        private void DebugNodeLinks()
+
+        private void DebugNodes(SplineNodeComponent splineNodeComponent)
+        {
+            var nodeMesh = new BulbMesh(GraphicsDevice, 0.4f);
+            nodeMesh.Build();
+
+            debugEntityNodes.Transform.Position = debugEntity.Transform.WorldToLocal(splineNodeComponent.Entity.Transform.WorldMatrix.TranslationVector);
+            debugEntityNodes.Add(
+                new ModelComponent
+                {
+                    Model = new Model
+                    {
+                                GizmoUniformColorMaterial.Create(GraphicsDevice, Color.LightSkyBlue),
+                                new Mesh { Draw = nodeMesh.MeshDraw }
+                    },
+                    RenderGroup = RenderGroup
+                }
+            );
+        }
+
+
+        private void DebugNodeLinks(SplineNodeComponent splineNodeComponent)
         {
             var nodeLinkLineMesh = new LineMesh(GraphicsDevice);
-            nodeLinkLineMesh.Build(new Vector3[2] { Component.Entity.Transform.Position, Component.Next.Entity.Transform.Position - Component.Entity.Transform.Position });
+            nodeLinkLineMesh.Build(new Vector3[2] { splineNodeComponent.Entity.Transform.Position, splineNodeComponent.Next.Entity.Transform.Position - splineNodeComponent.Entity.Transform.Position });
             debugEntityNodeLink.RemoveAll<ModelComponent>();
             debugEntityNodeLink.Add(
                 new ModelComponent
@@ -222,18 +266,18 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             );
         }
 
-        private void CreateOutHandler()
+        private void CreateOutHandler(SplineNodeComponent splineNodeComponent)
         {
-            var outMesh = new LightPointMesh(GraphicsDevice);
+            var outMesh = new BulbMesh(GraphicsDevice, 0.3f);
             outMesh.Build();
 
-            debugEntityOut.Transform.Position = Component.TangentOut;
+            debugEntityOut.Transform.Position = splineNodeComponent.TangentOut;
             debugEntityOut.Add(
                 new ModelComponent
                 {
                     Model = new Model
                     {
-                                GizmoUniformColorMaterial.Create(GraphicsDevice, Color.LightSeaGreen),
+                                GizmoUniformColorMaterial.Create(GraphicsDevice, Color.LightGray),
                                 new Mesh { Draw = outMesh.MeshDraw }
                     },
                     RenderGroup = RenderGroup
@@ -241,12 +285,12 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             );
         }
 
-        private void CreateInHandler()
+        private void CreateInHandler(SplineNodeComponent splineNodeComponent)
         {
-            var inMesh = new LightPointMesh(GraphicsDevice);
+            var inMesh = new BulbMesh(GraphicsDevice, 0.3f);
             inMesh.Build();
 
-            debugEntityIn.Transform.Position = Component.TangentIn;
+            debugEntityIn.Transform.Position = splineNodeComponent.TangentIn;
             debugEntityIn.Add(
                 new ModelComponent
                 {
@@ -302,19 +346,21 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             }
         }
 
-        class LightPointMesh
+        class BulbMesh
         {
             private const int Tesselation = 360 / 6;
 
             public MeshDraw MeshDraw;
 
             private Buffer vertexBuffer;
+            private float _range;
 
             private readonly GraphicsDevice graphicsDevice;
 
-            public LightPointMesh(GraphicsDevice graphicsDevice)
+            public BulbMesh(GraphicsDevice graphicsDevice, float range = 0.4f)
             {
                 this.graphicsDevice = graphicsDevice;
+                this._range = range;
             }
 
             public void Build()
@@ -342,8 +388,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                         var longitude = (float)(i * 2.0 * Math.PI / Tesselation);
                         var dx = (float)Math.Cos(longitude);
                         var dy = (float)Math.Sin(longitude);
-                        var range = 0.4f;
-                        var normal = new Vector3(dx * range, dy * range, 0);
+                        var normal = new Vector3(dx * _range, dy * _range, 0);
                         Vector3.TransformNormal(ref normal, ref rotation, out normal);
 
                         if (i < Tesselation)

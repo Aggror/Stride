@@ -5,11 +5,12 @@ namespace Xenko.Engine.Spline
     [DataContract]
     public struct SplineDebugInfo
     {
-        private bool _points;
+        private bool _nodes;
+        private bool _nodesLink;
         private bool _segments;
+        private bool _points;
         private bool _out;
         private bool _in;
-        private bool _nodeLink;
 
         [DataMemberIgnore]
         public bool IsDirty { get; set; }
@@ -34,12 +35,22 @@ namespace Xenko.Engine.Spline
             }
         }
 
-        public bool NodesLink
+        public bool Nodes
         {
-            get { return _nodeLink; }
+            get { return _nodes; }
             set
             {
-                _nodeLink = value;
+                _nodes = value;
+                IsDirty = true;
+            }
+        }
+
+        public bool NodesLink
+        {
+            get { return _nodesLink; }
+            set
+            {
+                _nodesLink = value;
                 IsDirty = true;
             }
         }
