@@ -55,7 +55,7 @@ namespace Xenko.Engine.Spline
             }
         }
 
-        public bool OutHandler
+        public bool TangentOutwards
         {
             get { return _out; }
             set
@@ -65,7 +65,7 @@ namespace Xenko.Engine.Spline
             }
         }
 
-        public bool InHandler
+        public bool TangentInwards
         {
             get { return _in; }
             set
