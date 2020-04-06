@@ -105,7 +105,9 @@ namespace Xenko.Engine
             var newSplineNode = new Entity(startPos, entityName);
             var newSplineNodeComponent = newSplineNode.GetOrCreate<SplineNodeComponent>();
             Nodes.Add(newSplineNodeComponent);
-            _editorScene?.Entities.Add(newSplineNode);
+            //SceneSystem.SceneInstance.RootScene.Entities.Add(newSplineNode);
+            //_editorScene?.Entities.Add(newSplineNode);
+
             //Entity.Scene.Entities.Add(entity);
         }
     }
