@@ -22,12 +22,14 @@ namespace Xenko.Engine
         public SplineDebugInfo DebugInfo;
         private Scene _editorScene;
 
+        public bool Dirty { get; set; }
+
+        private int _previousNodeCount = 0;
         private List<SplineNodeComponent> _nodes;
         public List<SplineNodeComponent> Nodes
         {
             get
             {
-
                 if (_nodes == null)
                 {
                     _nodes = new List<SplineNodeComponent>();
@@ -37,20 +39,18 @@ namespace Xenko.Engine
             set
             {
                 _nodes = value;
-                DebugInfo.IsDirty = true;
             }
         }
 
         public SplineComponent()
         {
-            //CreateSplineNodeEntity();
-            //CreateSplineNodeEntity();
+            _previousNodeCount = 0;
+            Nodes = new List<SplineNodeComponent>();
         }
 
         internal void Initialize()
         {
-            //_editorScene = editorScene;
-
+            UpdateSpline();
         }
 
         ///// <summary>
@@ -71,6 +71,52 @@ namespace Xenko.Engine
 
         internal void Update(TransformComponent transformComponent)
         {
+            int currentNodeCount = Nodes.Count;
+            if (_previousNodeCount != currentNodeCount)
+            {
+                DeregisterSplineNodeDirtyEvents();
+                UpdateSpline();
+            }
+            else
+            {
+                if (Dirty)
+                {
+                    UpdateSpline();
+                }
+            }
+
+            _previousNodeCount = currentNodeCount;
+        }
+
+        private void DeregisterSplineNodeDirtyEvents()
+        {
+            for (int i = 0; i < Nodes.Count; i++)
+            {
+                var curNode = Nodes[i];
+                curNode.OnDirty -= MakeSplineDirty;
+            }
+        }
+
+        public void UpdateSpline()
+        {
+            Dirty = true;
+            if (Nodes.Count > 1)
+            {
+                var totalNodesCount = Nodes.Count;
+                for (int i = 0; i < totalNodesCount; i++)
+                {
+                    var curNode = Nodes[i];
+                    if (i < totalNodesCount - 1)
+                        curNode?.UpdateBezierCurve(Nodes[i + 1]);
+
+                    curNode.OnDirty += MakeSplineDirty;
+                }
+            }
+        }
+
+        private void MakeSplineDirty()
+        {
+            Dirty = true;
         }
 
         //Button to create new spline node
@@ -79,7 +125,6 @@ namespace Xenko.Engine
         {
             get
             {
-
                 return _createSplineNode;
             }
             set
@@ -94,11 +139,6 @@ namespace Xenko.Engine
 
         public void CreateSplineNodeEntity()
         {
-            if (_nodes == null)
-            {
-                _nodes = new List<SplineNodeComponent>();
-            }
-
             var nodesCount = Nodes.Count;
             var entityName = "Node_" + nodesCount;
             var startPos = nodesCount > 0 ? Nodes[nodesCount - 1].Entity.Transform.Position : Entity.Transform.Position;

@@ -25,25 +25,27 @@ namespace Xenko.Engine
     [ComponentCategory("Splines")]
     public sealed class SplineNodeComponent : EntityComponent
     {
-        public bool Dirty { get; private set; }
+        public delegate void SplineNodeDirtyEventHandler();
+        public event SplineNodeDirtyEventHandler OnDirty;
 
-        #region NextNode
-        private SplineNodeComponent _next;
-        public SplineNodeComponent Next
-        {
-            get { return _next; }
-            set
-            {
-                _next = value;
+        //#region NextNode
+        //private SplineNodeComponent _next;
+        //[DataMemberIgnore]
+        //public SplineNodeComponent Next
+        //{
+        //    get { return _next; }
+        //    set
+        //    {
+        //        _next = value;
 
-                if (_next != null)
-                {
-                    Dirty = true;
-                    _next.Previous = this;
-                }
-            }
-        }
-        #endregion
+        //        if (_next != null)
+        //        {
+        //            OnDirty?.Invoke();
+        //            _next.Previous = this;
+        //        }
+        //    }
+        //}
+        //#endregion
 
         #region PreviousNode
         private SplineNodeComponent _previous;
@@ -54,7 +56,7 @@ namespace Xenko.Engine
             set
             {
                 _previous = value;
-                Dirty = true;
+                OnDirty?.Invoke();
             }
         }
         #endregion
@@ -67,7 +69,8 @@ namespace Xenko.Engine
             set
             {
                 _tangentOut = value;
-                Dirty = true;
+                OnDirty?.Invoke();
+
             }
         }
         #endregion
@@ -81,7 +84,8 @@ namespace Xenko.Engine
             set
             {
                 _TangentIn = value;
-                Dirty = true;
+                OnDirty?.Invoke();
+
             }
         }
         #endregion
@@ -101,7 +105,8 @@ namespace Xenko.Engine
                 {
                     _segments = value;
                 }
-                Dirty = true;
+                OnDirty?.Invoke();
+
             }
         }
         #endregion
@@ -113,16 +118,6 @@ namespace Xenko.Engine
         {
             CheckDirtyness();
 
-            if (Next != null && Dirty)
-            {
-                UpdateBezierCurve();
-            }
-
-            if (Previous != null && Dirty)
-            {
-                Previous.MakeDirty();
-            }
-
             _previousVector = Entity.Transform.Position;
         }
 
@@ -132,34 +127,29 @@ namespace Xenko.Engine
                     _previousVector.Y != Entity.Transform.Position.Y ||
                     _previousVector.Z != Entity.Transform.Position.Z)
             {
-                Dirty = true;
+                OnDirty?.Invoke();
             }
         }
 
         public void MakeDirty()
         {
-            Dirty = true;
+            OnDirty?.Invoke();
+
         }
 
-        public void MakeClean()
+        public void UpdateBezierCurve(SplineNodeComponent nextNode)
         {
-            Dirty = false;
-        }
-
-        public void UpdateBezierCurve()
-        {
-            if (Next != null)
+            if (nextNode != null)
             {
                 Vector3 scale;
                 Quaternion rotation;
                 Vector3 entityWorldPos;
                 Vector3 nextWorldPos;
 
-
                 Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out entityWorldPos);
-                Next.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out nextWorldPos);
+                nextNode.Entity.Transform.WorldMatrix.Decompose(out scale, out rotation, out nextWorldPos);
                 Vector3 TangentOutWorld = entityWorldPos + TangentOut;
-                Vector3 TangentInWorld = nextWorldPos + Next.TangentIn;
+                Vector3 TangentInWorld = nextWorldPos + nextNode.TangentIn;
 
                 _splineNode = new SplineNode(Segments, entityWorldPos, TangentOutWorld, nextWorldPos, TangentInWorld);
             }
@@ -167,11 +157,6 @@ namespace Xenko.Engine
 
         public SplineNode GetSplineNode()
         {
-            if (_splineNode == null && Next != null)
-            {
-                UpdateBezierCurve();
-            }
-
             return _splineNode;
         }
     }

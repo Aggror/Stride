@@ -73,7 +73,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             GizmoRootEntity.Transform.Scale = 1 * scale;
             GizmoRootEntity.Transform.UpdateWorldMatrix();
 
-            if (Component.Nodes?.Count > 1)
+            if (Component.Nodes?.Count > 1 && Component.Dirty)
             {
                 ClearChildren(gizmoNodes);
                 ClearChildren(gizmoNodeLinks);
@@ -82,61 +82,62 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                 ClearChildren(gizmoTangentOut);
                 ClearChildren(gizmoTangentIn);
 
-                foreach (var node in Component.Nodes)
+                var totalNodesCount = Component.Nodes.Count;
+                for (int i = 0; i < totalNodesCount; i++)
                 {
-                    if (node == null || !node.Dirty)
+                    var curNode = Component.Nodes[i];
+                    if (curNode == null)
                     {
                         break;
                     }
 
+                    //allways draw
                     if (Component.DebugInfo.Nodes)
                     {
-                        DrawNodes(node);
-                    }
-
-
-                    if (node.Next == null)
-                    {
-                        break;
-                    }
-                    node.MakeClean();
-
-
-                    if (Component.DebugInfo.NodesLink)
-                    {
-                        DrawNodeLinks(node);
-                    }
-
-                    if (Component.DebugInfo.Segments || Component.DebugInfo.Points)
-                    {
-                        var splinePointsInfo = node.GetSplineNode().GetSplinePointInfo();
-                        var splinePoints = new Vector3[splinePointsInfo.Length];
-                        for (int i = 0; i < splinePointsInfo.Length; i++)
-                        {
-                            splinePoints[i] = splinePointsInfo[i].position;
-                        }
-
-                        if (Component.DebugInfo.Points)
-                        {
-                            DrawSplinePoints(splinePoints);
-                        }
-
-                        if (Component.DebugInfo.Segments)
-                        {
-                            DrawSplineSegments(splinePoints);
-                        }
+                        DrawNodes(curNode);
                     }
 
                     if (Component.DebugInfo.TangentOutwards)
                     {
-                        DrawTangentOutwards(node);
+                        DrawTangentOutwards(curNode);
                     }
 
                     if (Component.DebugInfo.TangentInwards)
                     {
-                        DrawTangentInwards(node);
+                        DrawTangentInwards(curNode);
+                    }
+
+                    //Draw all, but last node
+                    if (i < totalNodesCount - 1)
+                    {
+                        if (Component.DebugInfo.NodesLink)
+                        {
+                            DrawNodeLinks(curNode, Component.Nodes[i+1]);
+                        }
+
+                        if (Component.DebugInfo.Segments || Component.DebugInfo.Points)
+                        {
+                            var splinePointsInfo = curNode.GetSplineNode().GetSplinePointInfo();
+                            var splinePoints = new Vector3[splinePointsInfo.Length];
+                            for (int j = 0; j < splinePointsInfo.Length; j++)
+                            {
+                                splinePoints[j] = splinePointsInfo[j].position;
+                            }
+
+                            if (Component.DebugInfo.Points)
+                            {
+                                DrawSplinePoints(splinePoints);
+                            }
+
+                            if (Component.DebugInfo.Segments)
+                            {
+                                DrawSplineSegments(splinePoints);
+                            }
+                        }
                     }
                 }
+
+                Component.Dirty = false;
             }
         }
 
@@ -151,7 +152,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             for (int i = 0; i < localPoints.Length - 1; i++)
             {
                 var lineMesh = new LineMesh(GraphicsDevice);
-                lineMesh.Build(new Vector3[2] { localPoints[i], localPoints[i + 1]- localPoints[i] });
+                lineMesh.Build(new Vector3[2] { localPoints[i], localPoints[i + 1] - localPoints[i] });
 
                 var segment = new Entity()
                 {
@@ -219,10 +220,10 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
             node.Transform.Position += splineNodeComponent.Entity.Transform.Position;
         }
 
-        private void DrawNodeLinks(SplineNodeComponent splineNodeComponent)
+        private void DrawNodeLinks(SplineNodeComponent currentSplineNodeComponent, SplineNodeComponent nextSplineNodeComponent)
         {
             var nodeLinkLineMesh = new LineMesh(GraphicsDevice);
-            nodeLinkLineMesh.Build(new Vector3[2] { splineNodeComponent.Entity.Transform.Position, splineNodeComponent.Next.Entity.Transform.Position - splineNodeComponent.Entity.Transform.Position });
+            nodeLinkLineMesh.Build(new Vector3[2] { currentSplineNodeComponent.Entity.Transform.Position, nextSplineNodeComponent.Entity.Transform.Position - currentSplineNodeComponent.Entity.Transform.Position });
             var nodeLink = new Entity()
                 {
                     new ModelComponent
@@ -236,7 +237,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
                     }
                 };
             gizmoNodeLinks.AddChild(nodeLink);
-            nodeLink.Transform.Position += splineNodeComponent.Entity.Transform.Position;
+            nodeLink.Transform.Position += currentSplineNodeComponent.Entity.Transform.Position;
         }
 
         private void DrawTangentOutwards(SplineNodeComponent splineNodeComponent)
@@ -262,7 +263,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
         }
 
         private void DrawTangentInwards(SplineNodeComponent splineNodeComponent)
-        { 
+        {
             var inMesh = new BulbMesh(GraphicsDevice, 0.3f);
             inMesh.Build();
 
