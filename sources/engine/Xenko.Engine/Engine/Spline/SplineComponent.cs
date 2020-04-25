@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Xenko.Core;
+using Xenko.Core.Mathematics;
 using Xenko.Engine.Design;
 using Xenko.Engine.Processors;
 using Xenko.Engine.Spline;
@@ -149,6 +150,62 @@ namespace Xenko.Engine
             //_editorScene?.Entities.Add(newSplineNode);
 
             //Entity.Scene.Entities.Add(entity);
+        }
+
+        public float GetTotalSplineDistance()
+        {
+            float distance = 0;
+            foreach (var node in Nodes)
+            {
+                distance += node.GetSplineNode().SplineDistance;
+            }
+            return distance;
+        }
+
+        public float GetNodeLinkDistance()
+        {
+            float distance = 0;
+            foreach (var node in Nodes)
+            {
+                distance += node.GetSplineNode().NodeLinkDistance;
+            }
+            return distance;
+        }
+
+        public ClosestPointInfo GetClosestPointOnSpline(Vector3 otherPosition)
+        {
+            ClosestPointInfo closestPointInfo = null;
+
+            var totalNodesCount = Nodes.Count;
+            for (int i = 0; i < totalNodesCount-1; i++)
+            {
+
+                //for key, nodeEntity in ipairs(self.nodeEntities) do
+                //        local nextNodeEntity = nodeEntity.script.nextNodeEntity
+                //    if nextNodeEntity ~= nil then
+                //        local closestPointInfoTemp = nodeEntity.script.node:GetClosestPointOnNodeCurve(otherPosition)
+                //        local dist = closestPointInfoTemp.closestPoint:DistanceToPoint(otherPosition)
+
+                //        if shortestDistance == nil or shortestDistance > dist then
+
+                //            shortestDistance = dist
+                //            closestPointInfo = closestPointInfoTemp
+                //        end
+                //    else
+                //    break
+                //    end
+                //end
+                //closestPointInfo.distance = closestPointInfo.closestPoint:DistanceToPoint(otherPosition)
+                //closestPointInfo.Distance = closestPointInfo.ClosestPoint:
+            }
+
+            return closestPointInfo;
+        }
+
+        public class ClosestPointInfo
+        {
+            public float Distance = 0;
+            public Vector3 ClosestPoint;
         }
     }
 }

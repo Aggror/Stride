@@ -47,19 +47,19 @@ namespace Xenko.Engine
         //}
         //#endregion
 
-        #region PreviousNode
-        private SplineNodeComponent _previous;
-        [DataMemberIgnore]
-        public SplineNodeComponent Previous
-        {
-            get { return _previous; }
-            set
-            {
-                _previous = value;
-                OnDirty?.Invoke();
-            }
-        }
-        #endregion
+        //#region PreviousNode
+        //private SplineNodeComponent _previous;
+        //[DataMemberIgnore]
+        //public SplineNodeComponent Previous
+        //{
+        //    get { return _previous; }
+        //    set
+        //    {
+        //        _previous = value;
+        //        OnDirty?.Invoke();
+        //    }
+        //}
+        //#endregion
 
         #region Out
         private Vector3 _tangentOut { get; set; }

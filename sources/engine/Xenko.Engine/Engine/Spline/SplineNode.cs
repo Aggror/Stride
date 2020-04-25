@@ -17,8 +17,9 @@ namespace Xenko.Engine.Spline
         private Vector3 _targetPos;
 
         private SplinePointInfo[] _splinePoints;
-        private float _splineLength;
-        private float _nodeLength;
+
+        public float NodeLinkDistance { get; private set; } = 0;
+        public float SplineDistance { get; private set; } = 0;
 
         public SplineNode(int segments, Vector3 startPos, Vector3 startHandlerPos, Vector3 targetPos, Vector3 targetHandlerPos)
         {
@@ -35,7 +36,7 @@ namespace Xenko.Engine.Spline
         }
 
 
-        public SplinePointInfo[] GetSplinePointInfo()
+        public SplinePointInfo[] GetSplinePoints()
         {
             return _splinePoints;
         }
@@ -48,7 +49,7 @@ namespace Xenko.Engine.Spline
             public float totalDistance;
         }
 
-        public float CalculateBezierSplineSpoints()
+        public void CalculateBezierSplineSpoints()
         {
             p0 = _startPos;
             p1 = _startHandlerPos;
@@ -91,11 +92,10 @@ namespace Xenko.Engine.Spline
 
             for (int i = 0; i < _nodesCount; i++)
             {
-                _splineLength += _splinePoints[i].distance;
+                SplineDistance += _splinePoints[i].distance;
             }
 
-            _nodeLength = Vector3.Distance(p0, p3);
-            return _splineLength;
+            NodeLinkDistance = Vector3.Distance(p0, p3);
         }
 
         private Vector3 CalculateBezierPoint(float t)

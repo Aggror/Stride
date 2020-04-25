@@ -117,7 +117,7 @@ namespace Xenko.Assets.Presentation.AssetEditors.Gizmos
 
                         if (Component.DebugInfo.Segments || Component.DebugInfo.Points)
                         {
-                            var splinePointsInfo = curNode.GetSplineNode().GetSplinePointInfo();
+                            var splinePointsInfo = curNode.GetSplineNode().GetSplinePoints();
                             var splinePoints = new Vector3[splinePointsInfo.Length];
                             for (int j = 0; j < splinePointsInfo.Length; j++)
                             {
