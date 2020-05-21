@@ -45,8 +45,6 @@ namespace CSharpIntermediate.Code
             //Tutorial button text - Tutorial scene name
             var tutorialScenes = new Dictionary<string, string>();
             tutorialScenes.Add("Collision trigger", "CollisionTrigger");
-            tutorialScenes.Add("Raycasting", "Raycasting");
-  
 
             foreach (var keyPair in tutorialScenes)
             {

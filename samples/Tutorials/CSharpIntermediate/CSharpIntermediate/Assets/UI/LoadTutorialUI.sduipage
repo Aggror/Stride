@@ -44,14 +44,12 @@ Hierarchy:
                     51c0925b7825cb6e79eb818000a9e476~Panel.ZIndexPropertyKey: 10
                 BackgroundColor: {R: 156, G: 8, B: 8, A: 0}
                 DrawLayerNumber: 2
-                CanBeHitByUser: true
                 Width: 130.0
                 Height: 50.0
                 HorizontalAlignment: Left
                 VerticalAlignment: Top
                 Margin: {Top: 50.0}
                 Name: BtnTutorialMenu
-                Padding: {Left: 10.0, Top: 5.0, Right: 10.0, Bottom: 7.0}
                 Content: !TextBlock ref!! 42c26bd2-d2ad-4956-9ade-2c34e8211487
                 PressedImage: !SpriteFromTexture
                     Texture: 11885e0d-3260-4b62-a0fd-d5f908fa3e8f:UI/btn_normal
@@ -107,7 +105,6 @@ Hierarchy:
                 DependencyProperties: {}
                 BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
                 DrawLayerNumber: 2
-                CanBeHitByUser: true
                 Width: 303.0
                 Height: 32.65625
                 VerticalAlignment: Top
@@ -115,7 +112,6 @@ Hierarchy:
                 MaximumWidth: 3.40282347E+38
                 MaximumHeight: 3.40282347E+38
                 MaximumDepth: 3.40282347E+38
-                Padding: {Left: 10.0, Top: 5.0, Right: 10.0, Bottom: 7.0}
                 Content: !TextBlock ref!! 175165ef-6d72-47d9-bea5-f3bfe833f09f
                 PressedImage: !SpriteFromTexture
                     Texture: 11885e0d-3260-4b62-a0fd-d5f908fa3e8f:UI/btn_normal
@@ -138,7 +134,7 @@ Hierarchy:
                 MaximumHeight: 3.40282347E+38
                 MaximumDepth: 3.40282347E+38
                 Name: titleText
-                Text: C# BEGINNER
+                Text: C# INTERMEDIATE
                 Font: f7f1e44e-6a57-4b1f-818e-21711622883f:UI/OpenSans-font
                 TextSize: 50.0
                 TextColor: {R: 0, G: 255, B: 255, A: 255}

@@ -3,21 +3,7 @@ Id: 3ed06063-5bdf-4f8e-9090-47bcaba297e5
 SerializedVersion: {Stride: 3.1.0.1}
 Tags: []
 ChildrenIds:
-    - 90c8a632-2df9-4335-8f09-24cb13e131b6
-    - 9e1b53ff-dc0c-410a-8972-14f949f83a01
-    - dbb3b809-4ff0-41da-b125-78a5ea1ec89c
-    - 0a019d87-d943-4543-9b51-a4016200dff9
-    - ba8ed57d-74b9-4121-baf0-6a92463b600a
-    - 678cb64e-9dcd-44ea-8cdd-947667bbcc5a
-    - 52a557d6-1f2c-4983-a0bb-2c12d562d3bf
-    - d8597439-175b-42b3-81ca-d6553655e38f
-    - 137dcdfa-bfc8-4805-92a3-dd48f2b79061
-    - ee2eb459-7847-42b5-bd69-fc43a6625fd5
-    - c00aec52-d6b8-4eab-80c2-460ac8109da6
-    - 328aea72-1405-48be-bf32-2363a61870f7
-    - d625592d-d7c2-4151-bd8e-09ff90120d9e
-    - ca777fe9-5471-4137-a42d-fa87b6c20c91
-    - deb8b6f8-1da6-4ad7-8499-ebd34e1d423b
+    - a042c44b-49dd-400e-b1e3-a36014f3ccab
 Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
@@ -78,34 +64,6 @@ Hierarchy:
                         Model: a0e0c032-4635-45cc-9d48-35525b89f1bb:Models/Box3x1x1
                         Materials:
                             de6002b157a023dcb3c4bdf51dd052f2~0: ad74e5da-cb10-46b7-9c34-3d65a478df12:Materials/GridMTHazard
-        -   Entity:
-                Id: 0604bd02-17ec-495b-9bbc-d5d10af2f471
-                Name: MaterialModel
-                Components:
-                    2a1fffb9d6cd6e33cf1fccf1e5ded2fb: !TransformComponent
-                        Id: 4da44cb6-e6bd-4fcc-8c12-209fa714aaf5
-                        Position: {X: 3.364452, Y: 0.0, Z: 4.571283}
-                        Rotation: {X: 0.0, Y: 0.9214484, Z: 0.0, W: -0.388500571}
-                        Scale: {X: 0.2743822, Y: 0.2743822, Z: 0.2743822}
-                        Children: {}
-                    465427d1f3a400f46db05fdfb42f4f4a: !ModelComponent
-                        Id: f02cd07a-270e-4ebb-8450-e3eb960a1c37
-                        Model: d6eb9b8a-c70a-4d55-8da5-9dc32528d6bd:Models/MaterialModel
-                        Materials: {}
-        -   Entity:
-                Id: 0a66d3f3-eea7-442c-9bd8-cf9921504e95
-                Name: MaterialModel
-                Components:
-                    2a1fffb9d6cd6e33cf1fccf1e5ded2fb: !TransformComponent
-                        Id: 8239358c-2f9a-4479-88f8-12c111adfe38
-                        Position: {X: 3.97349548, Y: 0.0, Z: 3.16502142}
-                        Rotation: {X: 0.0, Y: 0.9214484, Z: 0.0, W: -0.388500571}
-                        Scale: {X: 0.2743822, Y: 0.2743822, Z: 0.2743822}
-                        Children: {}
-                    465427d1f3a400f46db05fdfb42f4f4a: !ModelComponent
-                        Id: 733ff5c7-b878-41a0-86f1-e4ed85cee8ba
-                        Model: d6eb9b8a-c70a-4d55-8da5-9dc32528d6bd:Models/MaterialModel
-                        Materials: {}
         -   Entity:
                 Id: 0b0aebde-f75b-4177-bbe7-a5777caa697f
                 Name: Wall0x2x2
@@ -349,34 +307,6 @@ Hierarchy:
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: f6d61afd-98f3-471b-88cb-5c5162ac41f1
         -   Entity:
-                Id: 27422ead-0154-465a-b8f5-913ff3949ed4
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: 1f5dd79b-b61f-4436-afcf-747ffd5da0bf
-                        Position: {X: -4.12946129, Y: 0.5, Z: 3.14475226}
-                        Rotation: {X: 0.0, Y: 0.8322969, Z: 0.0, W: 0.5543301}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 424fe80a-1433-49d0-ac6c-2cdb4a254e31
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: 361368cf-9139-4742-8601-2db0b6b9e418
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: 10f16761-455e-42be-b84f-dcea8b51db7a
-                        Position: {X: 4.416757, Y: 0.224972427, Z: -1.2439214}
-                        Rotation: {X: 0.0, Y: -0.7262596, Z: 0.0, W: 0.6874205}
-                        Scale: {X: 0.471479475, Y: 0.471479475, Z: 0.471479475}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 1330bf71-aecc-4ae6-ba2b-b1f465ce19a2
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
                 Id: 37dd38ea-425a-4b94-a203-8a1a907493e9
                 Name: Wall0x2x2
                 Components:
@@ -446,49 +376,6 @@ Hierarchy:
                 BasePartAsset: 3cc3c21e-b26c-443d-80bb-cb82044d3220:BlocksPrefabs/Wall0x2x2
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: edb2f97f-8acc-4750-996f-db48172c744b
-        -   Entity:
-                Id: 3b0f5160-6211-4cdf-9c5e-1f0293e4b160
-                Name: XStatue
-                Components:
-                    21f038f9e1b53a4b9e134f9867f51fc9: !TransformComponent
-                        Id: 862a31f8-f480-4bd3-93e8-86788f99e303
-                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children:
-                            07e4e4c206094beaac15b993c17bd2c9: ref!! 880bb9a0-c19f-40b4-985a-15e015dc2c91
-                            e12178746ac6f75d62479411af3aa72a: ref!! 07d0d628-371b-4967-a12b-9d96e372c583
-                            ebc49cff4c91c4f6ef23f728c3c4937a: ref!! 8239358c-2f9a-4479-88f8-12c111adfe38
-                            77487afa27c0cc44464aba624b1bc230: ref!! 4da44cb6-e6bd-4fcc-8c12-209fa714aaf5
-        -   Entity:
-                Id: 3fb5789a-4eb7-4e8d-9587-c67304be5905
-                Name: MaterialModel
-                Components:
-                    2a1fffb9d6cd6e33cf1fccf1e5ded2fb: !TransformComponent
-                        Id: 880bb9a0-c19f-40b4-985a-15e015dc2c91
-                        Position: {X: 4.04603052, Y: 0.0, Z: 4.04444456}
-                        Rotation: {X: 0.0, Y: 0.9214484, Z: 0.0, W: -0.388500571}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    465427d1f3a400f46db05fdfb42f4f4a: !ModelComponent
-                        Id: 49ead070-4c8f-42cc-927b-ac3233f75af6
-                        Model: d6eb9b8a-c70a-4d55-8da5-9dc32528d6bd:Models/MaterialModel
-                        Materials: {}
-        -   Entity:
-                Id: 4ba03add-cb5e-4d26-b7df-9ba01d73fb9c
-                Name: BoxCornerA
-                Components:
-                    790dfcd7eb274ef25cad0f49fa6295f1: !TransformComponent
-                        Id: 7c873a31-0fa5-4985-9807-9090dd0bef45
-                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children:
-                            97a3d5a31d2fb5b15db0cb008876cfa9: ref!! 40969724-2c1b-44f7-997b-748f79e5ccda
-                            c1e9f40a48a9bc32fb4ba39299034f4b: ref!! 389e6fdd-5184-4ee1-b70b-4faef0b3023e
-                            e02f6fb81e16b078f5c780d6a2f160c1: ref!! ea63e0df-3f94-4f34-bb73-c191f61ce44f
-                            61786ce812bf23a083e6d368d37a57e1: ref!! 1f5dd79b-b61f-4436-afcf-747ffd5da0bf
-                            9796d7f49b153cd26bfb81a824fa3dc1: ref!! dd23a52c-711f-4424-9277-2e5c385e9bcc
         -   Entity:
                 Id: 4ec232e6-4b20-4c2c-beb4-974d0e4bb487
                 Name: GridBase10x10
@@ -629,35 +516,6 @@ Hierarchy:
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: e6680a5b-b608-4ba6-9ac8-26f4c04f9745
         -   Entity:
-                Id: 5a2da74a-803e-4090-a92d-d12a2d06aca8
-                Name: BoxCornerC
-                Components:
-                    948d0fa673a8ae0dc1ffd623b76af7f1: !TransformComponent
-                        Id: 6a35a05e-257c-4198-948c-da68f195ea84
-                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children:
-                            8f9e22bc6a38d437c63504844eb00ee7: ref!! 10f16761-455e-42be-b84f-dcea8b51db7a
-                            754602ede7c104a1413cd05d19fcdea8: ref!! c1c79dc4-1d88-4273-81fe-3bae0a757a75
-                            48894ac4d89240c025100c3a9f9b4342: ref!! d2037c65-1b40-4808-b596-8f7c91fb7be2
-                            07898ed289501d1a9f9024294beb6ac3: ref!! e4453ddc-22b0-4977-8bdf-ef5516317545
-                            60a619800cff0198c4e03b7b37bce6f5: ref!! 77dfc939-09c2-44ed-a49e-e483aa08c07c
-        -   Entity:
-                Id: 6679650d-e7a8-44b5-ab7e-dc53805f4f2b
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: dd0df361-0241-48b2-87f5-03a46975f0a5
-                        Position: {X: -3.33904743, Y: 0.5, Z: -4.42700148}
-                        Rotation: {X: 0.0, Y: -0.0287331231, Z: 0.0, W: 0.9995871}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: d7eec79c-e42c-475c-b511-24b055bee092
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
                 Id: 68d5ed5b-4427-47a7-96d5-ca48d41f404c
                 Name: Wall0x2x2
                 Components:
@@ -727,34 +585,6 @@ Hierarchy:
                 BasePartAsset: 3cc3c21e-b26c-443d-80bb-cb82044d3220:BlocksPrefabs/Wall0x2x2
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: d9c480ab-c2b8-495a-8a64-0dca5b102259
-        -   Entity:
-                Id: 70088548-9a13-4a43-8049-708bd383ee55
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: c1c79dc4-1d88-4273-81fe-3bae0a757a75
-                        Position: {X: 4.416757, Y: 0.5, Z: -2.39830613}
-                        Rotation: {X: 0.0, Y: -0.6504509, Z: 0.0, W: 0.7595483}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 3aff3d9e-1144-4ae4-80a3-c55f609eb755
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: 80443ae4-4786-4f59-912b-aefa27f31d39
-                Name: MagazineModel
-                Components:
-                    9869ab22904480747c15142b79bae0b2: !TransformComponent
-                        Id: 3c4d5860-4adb-40e9-9f67-a50fcd3f8180
-                        Position: {X: 0.74335134, Y: 0.9371904, Z: -0.3371178}
-                        Rotation: {X: 0.0124592427, Y: -0.974196255, Z: 0.2183983, W: -0.0555762053}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    6d859e897c7bcb270402105f41cf3b8c: !ModelComponent
-                        Id: 30e38844-9533-4bb5-b4b1-c7a57af12899
-                        Model: d3f4cbe1-353f-4367-9f44-df64df144f71:Models/MagazineModel
-                        Materials: {}
         -   Entity:
                 Id: 816a469c-d74c-49f0-91f8-66f327ee21cd
                 Name: Wall0x2x2
@@ -844,54 +674,6 @@ Hierarchy:
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: 42071e64-8f50-47f6-bac7-0b40d2e06357
         -   Entity:
-                Id: 8af90659-874a-4e38-bd12-606d305f91c3
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: 7dde2f8e-5a54-4a48-a767-0fba7663c5dc
-                        Position: {X: -4.45584536, Y: 0.499999821, Z: -3.752908}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 9d3ba897-2610-404f-b494-b328f96c181a
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: 8c41b51a-3b69-4aeb-ba84-c960c289c263
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: d570c9a6-a343-4113-b9cb-c1d19f7c63cf
-                        Position: {X: -3.87171674, Y: 1.5, Z: -4.06361771}
-                        Rotation: {X: 0.0, Y: 0.195090473, Z: 0.0, W: 0.980785251}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: c6dea829-fd62-4ec2-8975-d29a701c0799
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: 95dcb499-0177-4966-81a1-d0f18d2b293b
-                Name: table
-                Components:
-                    07d3118140cdb578e0f7d5af3c34253f: !TransformComponent
-                        Id: a089c01c-c9ec-44eb-a905-6bb5d5e10dca
-                        Position: {X: -0.0411092937, Y: 0.0, Z: -4.533401}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children:
-                            78d60d111f25bd2b909d541de86c0a5d: ref!! 59b12c30-e08b-404d-be7c-8083d951ce7b
-                            e72fc94d4abd4afcbfc7340d24bfb08a: ref!! d683f786-3f6d-473a-bd33-228f006bc91c
-                            147c20eb7ab1cc301a2887c33f9a4968: ref!! 96b9b7f8-861b-4d7c-af08-231d3f71449a
-                            128c418aceb093e5fea6da5ddc91042f: ref!! 54d83c89-54cc-482c-8474-fe28053d1e4e
-                            be98e1f89fc7a5e869cfa11cdb0f44b1: ref!! 3c4d5860-4adb-40e9-9f67-a50fcd3f8180
-                            a647c70dfe55ec6a2f8b4e58384dbded: ref!! 5a9dc939-21e1-4e2b-8bb9-773fb80f665a
-                    abae9c0d454158a0fb92015cb7d0b83c: !ModelComponent
-                        Id: de7aac7f-ae3f-409c-b435-d56fd29f40b2
-                        Model: d5482be8-144a-4f3a-a6c6-238c4a8e7908:Models/table
-                        Materials: {}
-        -   Entity:
                 Id: 960d9e75-1528-4bfa-9ae0-3e70109da409
                 Name: Wall0x2x2
                 Components:
@@ -927,20 +709,6 @@ Hierarchy:
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: f2ec26c2-3ea9-48e3-89c1-415f4e369427
         -   Entity:
-                Id: 97dcea21-9588-4928-a156-8ec463ee4828
-                Name: MaterialModel
-                Components:
-                    2a1fffb9d6cd6e33cf1fccf1e5ded2fb: !TransformComponent
-                        Id: 07d0d628-371b-4967-a12b-9d96e372c583
-                        Position: {X: 4.56061745, Y: 0.0, Z: 3.43333316}
-                        Rotation: {X: 0.0, Y: 0.9214484, Z: 0.0, W: -0.388500571}
-                        Scale: {X: 0.2743822, Y: 0.2743822, Z: 0.2743822}
-                        Children: {}
-                    465427d1f3a400f46db05fdfb42f4f4a: !ModelComponent
-                        Id: b76aae65-5025-48bb-865a-6e5f115ae1ae
-                        Model: d6eb9b8a-c70a-4d55-8da5-9dc32528d6bd:Models/MaterialModel
-                        Materials: {}
-        -   Entity:
                 Id: 98bde2e7-bb95-429c-b925-f141fa55b803
                 Name: Box3x1x1
                 Components:
@@ -955,20 +723,6 @@ Hierarchy:
                         Model: a0e0c032-4635-45cc-9d48-35525b89f1bb:Models/Box3x1x1
                         Materials:
                             de6002b157a023dcb3c4bdf51dd052f2~0: ad74e5da-cb10-46b7-9c34-3d65a478df12:Materials/GridMTHazard
-        -   Entity:
-                Id: 9e9ef1d5-38fd-4783-a2b9-4beff53b8fb4
-                Name: MachinegunModel
-                Components:
-                    e5de8ef6f80d1c1d41d827f8df09c51f: !TransformComponent
-                        Id: 5a9dc939-21e1-4e2b-8bb9-773fb80f665a
-                        Position: {X: -0.421139956, Y: 0.8278033, Z: -0.4471863}
-                        Rotation: {X: 0.584157348, Y: 0.584157348, Z: 0.398447216, W: 0.398447216}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    845c1d233f86e0dff93f902a4654a795: !ModelComponent
-                        Id: e7de6d9a-0959-4642-aa27-c8b8122aad26
-                        Model: 32c1ef96-e4a0-49a2-b286-b932c6d43f49:Models/MachinegunModel
-                        Materials: {}
         -   Entity:
                 Id: a24ee057-0990-4679-9a68-72511a1a17e8
                 Name: Wall0x2x2
@@ -1004,20 +758,6 @@ Hierarchy:
                 BasePartAsset: 3cc3c21e-b26c-443d-80bb-cb82044d3220:BlocksPrefabs/Wall0x2x2
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: 075dd065-3d6b-4373-8416-53919e4baa09
-        -   Entity:
-                Id: a417e76f-1652-432f-a797-62c2967820df
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: ea63e0df-3f94-4f34-bb73-c191f61ce44f
-                        Position: {X: -3.46508574, Y: 0.5, Z: 4.21309042}
-                        Rotation: {X: 0.0, Y: 0.9345461, Z: 0.0, W: 0.355841964}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 6a3c8886-2eee-4811-a63b-9c86b3736ed9
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
         -   Folder: TutorialRequirements
             Entity:
                 Id: a594aea1-6b57-4bba-8e87-e779ab5df63e
@@ -1102,33 +842,6 @@ Hierarchy:
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: 39a76a96-4216-4fec-96fe-04633f327043
         -   Entity:
-                Id: b2f4e4ae-9183-43aa-9378-31a8fab4d49a
-                Name: MagazineModel
-                Components:
-                    9869ab22904480747c15142b79bae0b2: !TransformComponent
-                        Id: d683f786-3f6d-473a-bd33-228f006bc91c
-                        Position: {X: 0.757953763, Y: 0.8191248, Z: -0.101701856}
-                        Rotation: {X: 0.226708427, Y: 0.226708427, Z: 0.6697785, W: 0.6697785}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    6d859e897c7bcb270402105f41cf3b8c: !ModelComponent
-                        Id: 9689f532-d958-4747-9da3-33bd83a5f421
-                        Model: d3f4cbe1-353f-4367-9f44-df64df144f71:Models/MagazineModel
-                        Materials: {}
-        -   Entity:
-                Id: b45e073f-d192-45fb-8579-89a61bd4bb4c
-                Name: BoxCornerB
-                Components:
-                    fec5cd61322bebfb9a406b0d6870f04f: !TransformComponent
-                        Id: 4d09dbc9-c677-485b-8a69-5a8b4e222d4b
-                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children:
-                            96416f448a3f626cfe8a46c906622a82: ref!! 7dde2f8e-5a54-4a48-a767-0fba7663c5dc
-                            c55f0dcddfc9cec9d4db0c5cb305b940: ref!! d570c9a6-a343-4113-b9cb-c1d19f7c63cf
-                            e355d1b8e631cdde06fab2d2e8ff43eb: ref!! dd0df361-0241-48b2-87f5-03a46975f0a5
-        -   Entity:
                 Id: bac11695-81bb-4bfa-8470-6752ebf2e8d7
                 Name: Box3x1x1
                 Components:
@@ -1143,20 +856,6 @@ Hierarchy:
                         Model: a0e0c032-4635-45cc-9d48-35525b89f1bb:Models/Box3x1x1
                         Materials:
                             de6002b157a023dcb3c4bdf51dd052f2~0: ad74e5da-cb10-46b7-9c34-3d65a478df12:Materials/GridMTHazard
-        -   Entity:
-                Id: bdd665c8-416c-4543-b0ff-d6744cb9b322
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: e4453ddc-22b0-4977-8bdf-ef5516317545
-                        Position: {X: 2.9191, Y: 0.499999821, Z: -4.03959656}
-                        Rotation: {X: 0.0, Y: -0.4657083, Z: 0.0, W: 0.8849383}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 127852dd-2480-46bb-8d83-d767f1a535d8
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
         -   Folder: TutorialRequirements
             Entity:
                 Id: c1cf572c-c8b1-4b83-b098-57cb06ec99f5
@@ -1298,13 +997,7 @@ Hierarchy:
                         Position: {X: 0.0, Y: 0.0, Z: 0.0}
                         Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children:
-                            40deb8ac5d065afdc67f4d7ce161fe32: ref!! e1fc3070-5448-4f88-a2e9-1a7f700c9d98
-                            aade22930fa3b09eb57e9e33b51e7403: ref!! a089c01c-c9ec-44eb-a905-6bb5d5e10dca
-                            b07c2aa57c1bcb6b4f3e9e5622f6116b: ref!! 7c873a31-0fa5-4985-9807-9090dd0bef45
-                            5454bf04b951bf18955b28db49178f3b: ref!! 4d09dbc9-c677-485b-8a69-5a8b4e222d4b
-                            93f0591f86db10cd0e0ac79fddba37da: ref!! 6a35a05e-257c-4198-948c-da68f195ea84
-                            c8756fe1ff49c7c109b7710ce0635119: ref!! 862a31f8-f480-4bd3-93e8-86788f99e303
+                        Children: {}
         -   Entity:
                 Id: d4ef67e6-1c66-4cab-a4fc-cb8641993dd7
                 Name: Wall0x2x2
@@ -1356,51 +1049,9 @@ Hierarchy:
                         Page: 5175f272-13da-45dd-9f7b-540e7121dd56:UI/LoadTutorialUI
                         Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
                         Size: {X: 1.0, Y: 1.0, Z: 1.0}
-                    a071ed0a8246a83ec97aadc7a70f4da8: !CSharpBeginner.Code.TutorialUI,CSharpBeginner.Game
-                        Id: 243d53f1-6acd-4a38-aee8-14bf536d1f0f
+                    9a08daab6dd9c59ebc1b2e2cb579c5ed: !CSharpIntermediate.Code.TutorialUI,CSharpIntermediate.Game
+                        Id: 85f91d9f-661f-444f-a37a-ff27ea671f5a
                         Camera: ref!! 11c51eca-f227-48c5-afdb-199ed1d275cf
-        -   Entity:
-                Id: d85c827e-72b6-48fd-8a88-97d01983bebb
-                Name: MagazineModel
-                Components:
-                    9869ab22904480747c15142b79bae0b2: !TransformComponent
-                        Id: 54d83c89-54cc-482c-8474-fe28053d1e4e
-                        Position: {X: 0.649168432, Y: 0.9371904, Z: -0.3371178}
-                        Rotation: {X: 0.0124592427, Y: -0.974196255, Z: 0.2183983, W: -0.0555762053}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    6d859e897c7bcb270402105f41cf3b8c: !ModelComponent
-                        Id: 3f48a45a-dade-4fff-b0c9-332eb93036dd
-                        Model: d3f4cbe1-353f-4367-9f44-df64df144f71:Models/MagazineModel
-                        Materials: {}
-        -   Entity:
-                Id: d8e380a3-69f2-48e4-8e6f-f2a432dc8ba2
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: dd23a52c-711f-4424-9277-2e5c385e9bcc
-                        Position: {X: -4.40525246, Y: 0.224972427, Z: 2.02379537}
-                        Rotation: {X: 0.0, Y: 0.769815, Z: 0.0, W: 0.638267}
-                        Scale: {X: 0.471479475, Y: 0.471479475, Z: 0.471479475}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 38efd4fb-8e4e-48bb-b45b-d42e764c31f8
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: d93aa5bf-05a5-4ec1-9a70-cf19571e37a6
-                Name: MagazineModel
-                Components:
-                    9869ab22904480747c15142b79bae0b2: !TransformComponent
-                        Id: 96b9b7f8-861b-4d7c-af08-231d3f71449a
-                        Position: {X: 0.5534917, Y: 0.9371904, Z: -0.3371178}
-                        Rotation: {X: 0.0124592427, Y: -0.974196255, Z: 0.2183983, W: -0.0555762053}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    6d859e897c7bcb270402105f41cf3b8c: !ModelComponent
-                        Id: 323caad8-dd3c-4ff9-bdfe-63bab0922658
-                        Model: d3f4cbe1-353f-4367-9f44-df64df144f71:Models/MagazineModel
-                        Materials: {}
         -   Entity:
                 Id: d9b52f32-6dc0-46c6-b9ba-8d49304001fe
                 Name: GridBase10x10
@@ -1412,34 +1063,6 @@ Hierarchy:
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children:
                             ae82bdc1dbf296cb5347d9caf6b752f9: ref!! a4835066-ad71-4861-a0b1-bf44f38bdfc3
-        -   Entity:
-                Id: db71bda4-ee89-48b3-add1-c6d2b46c6518
-                Name: tableB
-                Components:
-                    27b40f87dc83f4e082bc391b44a630d1: !TransformComponent
-                        Id: e1fc3070-5448-4f88-a2e9-1a7f700c9d98
-                        Position: {X: -4.31898546, Y: 4.76837158E-07, Z: -0.9314277}
-                        Rotation: {X: 0.0, Y: 0.707106769, Z: 0.0, W: 0.707106769}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    3d00ed0baeabe05221aed41402b6be55: !ModelComponent
-                        Id: 0fe31919-15cf-41e5-8e6b-4151a161b79b
-                        Model: f5843999-e7e7-47d1-b2fe-b020a1f57982:Models/tableB
-                        Materials: {}
-        -   Entity:
-                Id: de47242b-8e67-41d1-99a2-832d509d2b12
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: d2037c65-1b40-4808-b596-8f7c91fb7be2
-                        Position: {X: 3.571106, Y: 1.2998625, Z: -3.898264}
-                        Rotation: {X: 0.0, Y: -0.284116775, Z: 0.0, W: 0.958789647}
-                        Scale: {X: 0.6088152, Y: 0.6088152, Z: 0.6088152}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: a42d19c3-abdc-4698-8b36-674d370459a4
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
         -   Entity:
                 Id: defa4480-1e83-4486-8e82-1f5e21fb5162
                 Name: Wall0x2x2
@@ -1511,48 +1134,6 @@ Hierarchy:
                 BasePartId: f73cb16c-30b9-4200-b872-56885e7023e2
                 InstanceId: 00ab1fc3-0016-4e9f-87b8-b57371865517
         -   Entity:
-                Id: dff4b909-3dab-40f0-a13e-0ec291742731
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: 40969724-2c1b-44f7-997b-748f79e5ccda
-                        Position: {X: -2.28305626, Y: 0.499999821, Z: 4.380714}
-                        Rotation: {X: 0.0, Y: 0.9345461, Z: 0.0, W: 0.355841964}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: e1ee4132-f3e6-478b-ae46-1cc70acb9613
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: e0c85fa4-be3f-4f25-b054-a1ed6773f775
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: 389e6fdd-5184-4ee1-b70b-4faef0b3023e
-                        Position: {X: -3.129411, Y: 0.319789648, Z: 2.55803847}
-                        Rotation: {X: 0.0, Y: 0.986010432, Z: 0.0, W: 0.1666835}
-                        Scale: {X: 0.6088152, Y: 0.6088152, Z: 0.6088152}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: dbfcff37-f924-43f3-9173-48540bed9ed9
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
-                Id: e6e4c071-4a27-4ff0-aa4d-1791d5f23821
-                Name: BoxF
-                Components:
-                    871611dfbf1309a5a1aacea7dbc0d8d0: !TransformComponent
-                        Id: 77dfc939-09c2-44ed-a49e-e483aa08c07c
-                        Position: {X: 4.026854, Y: 0.5, Z: -3.594433}
-                        Rotation: {X: 0.0, Y: -0.4657083, Z: 0.0, W: 0.8849383}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    dba5ae73c46fcc7913610ecc8e1fce70: !ModelComponent
-                        Id: 0ea0b8f1-2988-4af7-a69c-8c1646c82206
-                        Model: e288f24b-258b-4875-85bb-a696a7445a7c:Models/BoxF
-                        Materials: {}
-        -   Entity:
                 Id: e8dabbbc-5186-4a58-a802-668fa1b3a361
                 Name: Walls
                 Components:
@@ -1595,20 +1176,6 @@ Hierarchy:
                             0a67b908cc85ebc2d0ef4bb5c5da6188: ref!! 461ff6df-3c72-4393-b9d4-a477e03b1890
                             3d5412612886d17817b53756c95744c1: ref!! 43ed748c-c373-419a-9fd6-fee061cdaa3c
                             1d5119370818abfcd483fc47ff3e3caa: ref!! d5522d5b-79a8-4f2a-bca8-42e1531891b2
-        -   Entity:
-                Id: e920ec38-8085-40fd-86d0-f8fbebe41fa4
-                Name: MagazineModel
-                Components:
-                    9869ab22904480747c15142b79bae0b2: !TransformComponent
-                        Id: 59b12c30-e08b-404d-be7c-8083d951ce7b
-                        Position: {X: 0.8328291, Y: 0.8191248, Z: 0.0447203219}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.707106769, W: 0.707106769}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    6d859e897c7bcb270402105f41cf3b8c: !ModelComponent
-                        Id: c7acbf5c-d4ad-421f-b4b8-878b593282ff
-                        Model: d3f4cbe1-353f-4367-9f44-df64df144f71:Models/MagazineModel
-                        Materials: {}
         -   Entity:
                 Id: f4e4a94a-d6cb-4abb-adc7-08a6623c6b84
                 Name: Wall0x2x2
