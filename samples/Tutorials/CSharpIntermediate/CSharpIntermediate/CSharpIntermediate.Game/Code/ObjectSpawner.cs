@@ -2,6 +2,7 @@ using System.Linq;
 using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.Input;
+using Stride.Physics;
 
 namespace CSharpIntermediate.Code
 {
@@ -23,12 +24,28 @@ namespace CSharpIntermediate.Code
             if (Input.IsKeyPressed(Keys.S))
             {
                 prefabClone = prefabClone ?? ObjectToSpawn.Instantiate().First();
+                if (!Entity.Scene.Entities.Contains(prefabClone))
+                {
+                    Entity.Scene.Entities.Add(prefabClone);
+                }
+
                 Entity.Transform.GetWorldTransformation(out Vector3 worldPos, out Quaternion rot, out Vector3 scale);
                 prefabClone.Transform.Position = worldPos;
                 prefabClone.Transform.UpdateWorldMatrix();
+                var physicsComponent = prefabClone.Get<RigidbodyComponent>();
+                physicsComponent.Enabled = true;
+                physicsComponent.LinearVelocity = new Vector3(0);
+                physicsComponent.AngularVelocity = new Vector3(0);
+                physicsComponent.UpdatePhysicsTransformation();
+            }
+        }
 
-                prefabClone.Get<PhysicsComponent>().Enabled = true;
-                Entity.Scene.Entities.Add(prefabClone);
+        public override void Cancel()
+        {
+            if (prefabClone != null)
+            {
+                Entity.Scene.Entities.Remove(prefabClone);
+                prefabClone = null;
             }
         }
     }
