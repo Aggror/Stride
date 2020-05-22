@@ -8,37 +8,47 @@ namespace CSharpIntermediate.Code
 {
     public class CollisionTrigger : SyncScript
     {
-        PhysicsComponent collider;
+        PhysicsComponent triggerCollider;
         string enterStatus = "";
         string exitStatus = "";
 
         public override void Start()
         {
-            collider = Entity.Get<PhysicsComponent>();
-            collider.Collisions.CollectionChanged += collisionsChanged;
+            // Retrieve the Physics component of the current entity
+            triggerCollider = Entity.Get<PhysicsComponent>();
+
+            // When the 'CollectionChanged' event occurs, executed the CollisionsChanged method
+            triggerCollider.Collisions.CollectionChanged += CollisionsChanged;
         }
 
-        private void collisionsChanged(object sender, TrackingCollectionChangedEventArgs args)
+        private void CollisionsChanged(object sender, TrackingCollectionChangedEventArgs args)
         {
+            // Cast the argument 'item' to a collision object
             var collision = (Collision)args.Item;
-            if(args.Action == NotifyCollectionChangedAction.Add)
+
+            // We need to make sure which collision object is not the Trigger collider
+            // We perform a little check to find the ballCollider 
+            var ballCollider = triggerCollider == collision.ColliderA ? collision.ColliderB : collision.ColliderA;
+
+            if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                enterStatus = collision.ColliderA.Entity.Name + " entered " + collision.ColliderB.Entity.Name;
+                // When a collision has been added to the collision collection, we know an object 'entered' our trigger
+                enterStatus = ballCollider.Entity.Name + " entered " + triggerCollider.Entity.Name;
                 exitStatus = "";
             }
             else if (args.Action == NotifyCollectionChangedAction.Remove)
             {
+                // When a collision has been removed fromthe collision collection, we know an object 'left' our trigger
                 enterStatus = "";
-                exitStatus = collision.ColliderA.Entity.Name + " exited " + collision.ColliderB.Entity.Name;
+                exitStatus = ballCollider.Entity.Name + " left " + triggerCollider.Entity.Name;
             }
         }
 
         public override void Update()
         {
-            foreach (var collision in collider.Collisions)
+            // the trigger collider can have 0, 1 or multiple collision going on in a single frame
+            foreach (var collision in triggerCollider.Collisions)
             {
-                // Entity A is the entity that collides with the current entity and triggers the collision
-                // Entity B is the current entity that has a collider component
                 DebugText.Print("ColliderA: " + collision.ColliderA.Entity.Name, new Int2(500, 300));
                 DebugText.Print("ColliderB: " + collision.ColliderB.Entity.Name, new Int2(500, 320));
             }

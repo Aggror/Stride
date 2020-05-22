@@ -14,7 +14,7 @@ Hierarchy:
     Parts:
         -   Entity:
                 Id: 0f889b69-928f-42ae-9c75-eb72ec636f13
-                Name: SyncCollicionTrigger
+                Name: TriggerBox
                 Components:
                     159efef787b42c3c4ec38f93d1b5deaa: !TransformComponent
                         Id: ed07c166-a7fe-4843-90c0-de0aa475eecb
@@ -57,7 +57,7 @@ Hierarchy:
                         Children: {}
                     5df37d948e77d4fddd811c28cb558710: !CSharpIntermediate.Code.ObjectSpawner,CSharpIntermediate.Game
                         Id: 2bef5fdf-3d81-44c1-a6cc-ab027d787010
-                        ObjectToSpawn: c156b802-8b75-4660-abc8-7c8cdc0e2a2e:Prefabs/ObjectToSpawn
+                        ObjectToSpawn: c156b802-8b75-4660-abc8-7c8cdc0e2a2e:Prefabs/RollingBall
         -   Entity:
                 Id: c65a2a61-74ee-4952-8608-208fd0df40e0
                 Name: BounceWall

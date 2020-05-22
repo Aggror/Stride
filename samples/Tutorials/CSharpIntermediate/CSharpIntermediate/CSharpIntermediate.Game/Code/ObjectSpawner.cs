@@ -16,10 +16,8 @@ namespace CSharpIntermediate.Code
 
         public override void Update()
         {
-            if (prefabClone == null)
-            {
-                DebugText.Print("Press S to spawn object", new Int2(300, 180));
-            }
+
+            DebugText.Print("Press S to spawn ball", new Int2(300, 180));
 
             if (Input.IsKeyPressed(Keys.S))
             {
@@ -32,6 +30,7 @@ namespace CSharpIntermediate.Code
                 Entity.Transform.GetWorldTransformation(out Vector3 worldPos, out Quaternion rot, out Vector3 scale);
                 prefabClone.Transform.Position = worldPos;
                 prefabClone.Transform.UpdateWorldMatrix();
+
                 var physicsComponent = prefabClone.Get<RigidbodyComponent>();
                 physicsComponent.Enabled = true;
                 physicsComponent.LinearVelocity = new Vector3(0);
