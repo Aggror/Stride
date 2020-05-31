@@ -4,6 +4,7 @@ SerializedVersion: {Stride: 3.1.0.1}
 Tags: []
 ChildrenIds:
     - a042c44b-49dd-400e-b1e3-a36014f3ccab
+    - 7bdfe973-380e-4515-825a-071555408658
 Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
@@ -392,6 +393,7 @@ Hierarchy:
                         Materials: {}
                     e892de73aae78041aa74ca19b0b9f867: !StaticColliderComponent
                         Id: 21bbda04-897c-4aa2-9502-124100a2cf9e
+                        CollisionGroup*: StaticFilter
                         CanSleep: true
                         Restitution: 0.0
                         Friction: 0.5

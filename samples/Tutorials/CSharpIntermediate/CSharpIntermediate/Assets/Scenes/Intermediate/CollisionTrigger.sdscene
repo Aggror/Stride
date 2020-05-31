@@ -26,7 +26,7 @@ Hierarchy:
                         Id: 48abea3d-1ba8-4d33-9020-73748cd7714f
                         Model: 978173aa-c21e-422f-80fd-b8925a83e274:Models/Cube
                         Materials:
-                            96efbd55fe7ea16cc093dab020ab0471~0: d7fd13f6-ea4d-4321-aa5c-b83f6abbf8c7:Materials/YellowTransparent
+                            96efbd55fe7ea16cc093dab020ab0471~0: d7fd13f6-ea4d-4321-aa5c-b83f6abbf8c7:Materials/RedTransparent
                     37cf6c175184f9607b0448e652577a66: !StaticColliderComponent
                         Id: 5271f964-fd1f-410d-9721-f14ac866a20c
                         CanSleep: false
@@ -43,8 +43,8 @@ Hierarchy:
                                 Size: {X: 1.0, Y: 1.0, Z: 1.0}
                                 LocalOffset: {X: 0.0, Y: 0.0, Z: 0.0}
                                 LocalRotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                    551a52caa68c4ce4f434acbc4679cc17: !CSharpIntermediate.Code.CollisionTrigger,CSharpIntermediate.Game
-                        Id: b643f917-06d3-4c9e-bdd0-d0325f5b0bcd
+                    8eae753b0ae6688dac9a94cea81b37d5: !CSharpIntermediate.Code.CollisionTriggerTutorial,CSharpIntermediate.Game
+                        Id: f789c334-52e6-45ea-a0c7-43e3f1257553
         -   Entity:
                 Id: a63e8c3c-9f43-4a73-9120-122bb7d860b3
                 Name: Spawner

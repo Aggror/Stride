@@ -6,7 +6,7 @@ using Stride.Physics;
 
 namespace CSharpIntermediate.Code
 {
-    public class SpawnerCollisionGroup : SyncScript
+    public class ObjectSpawner : SyncScript
     {
         public Prefab ObjectToSpawn;
 

@@ -6,7 +6,7 @@ using Stride.Physics;
 
 namespace CSharpIntermediate.Code
 {
-    public class CollisionTrigger : SyncScript
+    public class CollisionTriggerTutorial : SyncScript
     {
         PhysicsComponent triggerCollider;
         string enterStatus = "";

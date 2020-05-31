@@ -41,7 +41,7 @@ Hierarchy:
                         Id: f76e508e-045f-426f-a959-63fa55fdf665
                         Model: 978173aa-c21e-422f-80fd-b8925a83e274:Models/Cube
                         Materials:
-                            96efbd55fe7ea16cc093dab020ab0471~0: d7fd13f6-ea4d-4321-aa5c-b83f6abbf8c7:Materials/YellowTransparent
+                            96efbd55fe7ea16cc093dab020ab0471~0: d7fd13f6-ea4d-4321-aa5c-b83f6abbf8c7:Materials/RedTransparent
                     0613ef4a4d9cf98cf900d665a96be803: !CSharpIntermediate.Code.CollisionTriggerDemo,CSharpIntermediate.Game
                         Id: 352f1ddf-5ab0-4bd9-8a86-70e6808b0662
                     37cf6c175184f9607b0448e652577a66: !StaticColliderComponent
