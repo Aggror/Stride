@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 
 using Xunit;
 
@@ -30,10 +29,6 @@ namespace Stride.Shaders.Tests
     /// </summary>
     public partial class TestMixinCompiler
     {
-        internal static void Main()
-        {
-            new TestMixinCompiler().TestMaterial();
-        }
         /// <summary>
         /// Tests mixin and compose keys with compilation.
         /// </summary>
