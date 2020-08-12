@@ -6,7 +6,7 @@ using Stride.Physics;
 
 namespace CSharpIntermediate.Code
 {
-    public class CollisionTriggerTutorial : SyncScript
+    public class CollisionTriggerDemo : SyncScript
     {
         PhysicsComponent triggerCollider;
         string enterStatus = "";
@@ -17,7 +17,7 @@ namespace CSharpIntermediate.Code
             // Retrieve the Physics component of the current entity
             triggerCollider = Entity.Get<PhysicsComponent>();
 
-            // When the 'CollectionChanged' event occurs, executed the CollisionsChanged method
+            // When the 'CollectionChanged' event occurs, execute the CollisionsChanged method
             triggerCollider.Collisions.CollectionChanged += CollisionsChanged;
         }
 

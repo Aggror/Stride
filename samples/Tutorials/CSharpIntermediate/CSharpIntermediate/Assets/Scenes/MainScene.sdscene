@@ -4,7 +4,9 @@ SerializedVersion: {Stride: 3.1.0.1}
 Tags: []
 ChildrenIds:
     - a042c44b-49dd-400e-b1e3-a36014f3ccab
+    - 34ae49a6-e078-4247-9eb3-23e207e0c55b
     - 7bdfe973-380e-4515-825a-071555408658
+    - 01da6640-4c60-4428-b29a-e2f29768f6c1
 Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
