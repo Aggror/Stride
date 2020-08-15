@@ -44,7 +44,9 @@ namespace CSharpIntermediate.Code
 
             //Tutorial button text - Tutorial scene name
             var tutorialScenes = new Dictionary<string, string>();
+            tutorialScenes.Add("UI interaction", "UI");
             tutorialScenes.Add("Collision trigger", "CollisionTrigger");
+            tutorialScenes.Add("Async Collision trigger", "CollisionTriggerAsync");
             //tutorialScenes.Add("Collision groups", "CollisionGroups");
             tutorialScenes.Add("Raycasting", "Raycasting");
             tutorialScenes.Add("Animation", "Animation");

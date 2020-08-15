@@ -19,4 +19,5 @@ RootAssets:
     - 34ae49a6-e078-4247-9eb3-23e207e0c55b:Scenes/Intermediate/CollisionTriggerAsync
     - 4ffb2c2a-974f-4322-9486-6ad8e28c5526:Scenes/Intermediate/CollisionGroups
     - 7bdfe973-380e-4515-825a-071555408658:Scenes/Intermediate/Raycasting
+    - 9064f76b-35cf-4c85-a35a-deb5e0bb9d91:Scenes/Intermediate/UI
     - a042c44b-49dd-400e-b1e3-a36014f3ccab:Scenes/Intermediate/CollisionTrigger

@@ -25,17 +25,7 @@ namespace CSharpIntermediate.Code
 
         public override void Update()
         {
-            DebugText.Print("Press Q and E to rotate the weapon", new Int2(500, 180));
-            var delta = (float)Game.UpdateTime.Elapsed.TotalSeconds;
-            if (Input.IsKeyDown(Keys.Q))
-            {
-                Entity.Transform.Rotation *= Quaternion.RotationY(RotationSpeed * delta);
-            }
-
-            if (Input.IsKeyDown(Keys.E))
-            {
-                Entity.Transform.Rotation *= Quaternion.RotationY(-RotationSpeed * delta);
-            }
+            RotateWeapon();
 
             hitPointVisualiser.Transform.Position = barrel.Transform.Position + new Vector3(0, 0, MaxDistance);
             var raycastEndWorldPosition = hitPointVisualiser.Transform.WorldMatrix.TranslationVector;
@@ -58,9 +48,24 @@ namespace CSharpIntermediate.Code
             else
             {
                 // The length of the raycast is similar to MaxDistance
-                var length = Vector3.Distance(barrelWorldPosition, raycastEndWorldPosition); 
+                var length = Vector3.Distance(barrelWorldPosition, raycastEndWorldPosition);
                 laser.Transform.Scale = new Vector3(0.01f, length, 1);
                 DebugText.Print("No collider hit", new Int2(500, 220));
+            }
+        }
+
+        private void RotateWeapon()
+        {
+            DebugText.Print("Press Q and E to rotate the weapon", new Int2(500, 180));
+            var delta = (float)Game.UpdateTime.Elapsed.TotalSeconds;
+            if (Input.IsKeyDown(Keys.Q))
+            {
+                Entity.Transform.Rotation *= Quaternion.RotationY(RotationSpeed * delta);
+            }
+
+            if (Input.IsKeyDown(Keys.E))
+            {
+                Entity.Transform.Rotation *= Quaternion.RotationY(-RotationSpeed * delta);
             }
         }
     }

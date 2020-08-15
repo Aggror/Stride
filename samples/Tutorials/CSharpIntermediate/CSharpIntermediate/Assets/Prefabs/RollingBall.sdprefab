@@ -23,8 +23,6 @@ Hierarchy:
                             616d29b6814dac8905bd46e2ed13d132~0: 619de649-4998-4996-bd74-085eaffdbbeb:Materials/Yellow
                     b46e72904703577e25d79e3c9ae00cdd: !RigidbodyComponent
                         Id: 92486f63-bea9-4b45-b9bf-6b6b37d3a6c4
-                        CollisionGroup: CustomFilter1
-                        CanCollideWith: CustomFilter1
                         CanSleep: false
                         Restitution: 0.0
                         Friction: 0.5
