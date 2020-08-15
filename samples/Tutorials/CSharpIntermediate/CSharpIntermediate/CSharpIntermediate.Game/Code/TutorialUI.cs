@@ -50,6 +50,7 @@ namespace CSharpIntermediate.Code
             //tutorialScenes.Add("Collision groups", "CollisionGroups");
             tutorialScenes.Add("Raycasting", "Raycasting");
             tutorialScenes.Add("Animation", "Animation");
+            tutorialScenes.Add("Child scenes", "ChildScenes");
 
             foreach (var keyPair in tutorialScenes)
             {

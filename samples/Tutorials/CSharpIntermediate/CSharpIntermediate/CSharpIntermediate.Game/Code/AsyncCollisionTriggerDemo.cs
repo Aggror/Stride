@@ -1,8 +1,5 @@
-using System;
 using System.Threading.Tasks;
-using Stride.Core.Mathematics;
 using Stride.Engine;
-using Stride.Physics;
 using Stride.Rendering;
 
 namespace CSharpIntermediate.Code
