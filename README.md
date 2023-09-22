@@ -72,6 +72,7 @@ Ask for help or report issues:
    - Note that when you use GitHub -> Code -> Download ZIP, this doesn't support Large File Support ```lfs```, make sure you use the command above or that your git client does it for you
 2. Open `<StrideDir>\build\Stride.sln` with Visual Studio 2022 and build `Stride.GameStudio` in the 60-Editor solution folder (it should be the default startup project) or run it from VS's toolbar.
    - Optionally, open and build `Stride.Android.sln`, `Stride.iOS.sln`, etc.
+   - Ensure that the the build type is set to 'Release' prior to selecting 'Build'. This will allow the launcher to find the newly created package.
 
 #### Build Stride without Visual Studio
 
