@@ -47,7 +47,7 @@ namespace Stride.Core
         public bool Inherited { get; set; }
 
         /// <summary>
-        /// The default member mode.
+        /// The member mode defines the behavior during serialization.
         /// </summary>
         public DataMemberMode DefaultMemberMode { get; set; } = DataMemberMode.Default;
     }
