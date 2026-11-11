@@ -296,6 +296,22 @@ namespace Stride.Graphics
             if (enablePortabilityEnumeration)
                 desiredExtensionNames.Add(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 
+            // Extensions another API sharing the device asked for (an OpenXR runtime, for instance)
+            if (VulkanExtensionRequests.InstanceExtensions.Count > 0)
+            {
+                var requestedExtensionNames = new VkUtf8String[VulkanExtensionRequests.InstanceExtensions.Count];
+                for (int i = 0; i < requestedExtensionNames.Length; i++)
+                    requestedExtensionNames[i] = VulkanExtensionRequests.InstanceExtensions[i];
+
+                var availableRequestedNames = GetAvailableExtensionNames(requestedExtensionNames);
+                foreach (var name in requestedExtensionNames)
+                {
+                    if (!availableRequestedNames.Contains(name))
+                        throw new InvalidOperationException($"Requested Vulkan instance extension {name} is not available");
+                    desiredExtensionNames.Add(name);
+                }
+            }
+
             bool enableDebugUtils = enableValidation && availableExtensionNames.Contains(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             if (enableDebugUtils)
                 desiredExtensionNames.Add(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

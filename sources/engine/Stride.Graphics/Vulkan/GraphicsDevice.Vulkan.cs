@@ -595,6 +595,22 @@ namespace Stride.Graphics
                 desiredExtensionProperties.Add(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
             }
 
+            // Extensions another API sharing the device asked for (an OpenXR runtime, for instance)
+            if (VulkanExtensionRequests.DeviceExtensions.Count > 0)
+            {
+                var requestedExtensionNames = new VkUtf8String[VulkanExtensionRequests.DeviceExtensions.Count];
+                for (int i = 0; i < requestedExtensionNames.Length; i++)
+                    requestedExtensionNames[i] = VulkanExtensionRequests.DeviceExtensions[i];
+
+                var availableRequestedNames = GetAvailableExtensionProperties(requestedExtensionNames);
+                foreach (var name in requestedExtensionNames)
+                {
+                    if (!availableRequestedNames.Contains(name))
+                        throw new InvalidOperationException($"Requested Vulkan device extension {name} is not available on {Adapter.Description}");
+                    desiredExtensionProperties.Add(name);
+                }
+            }
+
             // Profiling labels travel through VK_EXT_debug_utils (instance-level, enabled at factory init).
             // Replaces the deprecated VK_EXT_debug_marker which required a separate device extension and
             // a VK_EXT_debug_report dependency to satisfy validation.
