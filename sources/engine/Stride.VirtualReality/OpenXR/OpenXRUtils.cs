@@ -19,6 +19,7 @@ namespace Stride.VirtualReality
     {
         public const string XR_KHR_D3D11_ENABLE_EXTENSION_NAME = "XR_KHR_D3D11_enable";
         public const string XR_KHR_VULKAN_ENABLE_EXTENSION_NAME = "XR_KHR_vulkan_enable";
+        public const string XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME = "XR_KHR_vulkan_enable2";
         public const string XR_FB_PASSTHROUGH_EXTENSION_NAME = "XR_FB_passthrough";
 
         public static bool Success(this Result result) => result >= 0;
@@ -41,6 +42,11 @@ namespace Stride.VirtualReality
             return result;
         }
 
+        /// <summary>
+        ///   Whether the runtime offers XR_KHR_vulkan_enable2, which Stride prefers over XR_KHR_vulkan_enable.
+        /// </summary>
+        public static bool HasVulkanEnable2(this XR xr) => xr.IsInstanceExtensionPresent(null, XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME);
+
         public static Instance CreateRuntime(this XR xr, IReadOnlyList<string> extensions, Logger logger)
         {
             LogApiLayers(xr, logger);
@@ -51,7 +57,8 @@ namespace Stride.VirtualReality
 #if STRIDE_GRAPHICS_API_DIRECT3D11
             openXrExtensions.Add(XR_KHR_D3D11_ENABLE_EXTENSION_NAME);
 #elif STRIDE_GRAPHICS_API_VULKAN
-            openXrExtensions.Add(XR_KHR_VULKAN_ENABLE_EXTENSION_NAME);
+            // XR_KHR_vulkan_enable2 when the runtime has it, else XR_KHR_vulkan_enable
+            openXrExtensions.Add(xr.HasVulkanEnable2() ? XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME : XR_KHR_VULKAN_ENABLE_EXTENSION_NAME);
 #endif
 #if DEBUG_OPENXR
             openXrExtensions.Add("XR_EXT_debug_utils");
@@ -96,9 +103,9 @@ namespace Stride.VirtualReality
                 return default;
             }
 #elif STRIDE_GRAPHICS_API_VULKAN
-            if (!availableExtensions.Contains(XR_KHR_VULKAN_ENABLE_EXTENSION_NAME))
+            if (!availableExtensions.Contains(XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME) && !availableExtensions.Contains(XR_KHR_VULKAN_ENABLE_EXTENSION_NAME))
             {
-                logger.Error($"OpenXR error! The OpenXR runtime doesn't support Vulkan ({XR_KHR_VULKAN_ENABLE_EXTENSION_NAME})");
+                logger.Error($"OpenXR error! The OpenXR runtime doesn't support Vulkan ({XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME} or {XR_KHR_VULKAN_ENABLE_EXTENSION_NAME})");
                 return default;
             }
 #endif

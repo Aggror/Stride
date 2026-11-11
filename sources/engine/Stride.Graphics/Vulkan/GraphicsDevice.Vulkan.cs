@@ -596,11 +596,11 @@ namespace Stride.Graphics
             }
 
             // Extensions another API sharing the device asked for (an OpenXR runtime, for instance)
-            if (VulkanExtensionRequests.DeviceExtensions.Count > 0)
+            if (VulkanCreationHooks.DeviceExtensions.Count > 0)
             {
-                var requestedExtensionNames = new VkUtf8String[VulkanExtensionRequests.DeviceExtensions.Count];
+                var requestedExtensionNames = new VkUtf8String[VulkanCreationHooks.DeviceExtensions.Count];
                 for (int i = 0; i < requestedExtensionNames.Length; i++)
-                    requestedExtensionNames[i] = VulkanExtensionRequests.DeviceExtensions[i];
+                    requestedExtensionNames[i] = VulkanCreationHooks.DeviceExtensions[i];
 
                 var availableRequestedNames = GetAvailableExtensionProperties(requestedExtensionNames);
                 foreach (var name in requestedExtensionNames)
@@ -694,7 +694,11 @@ namespace Stride.Graphics
                 pEnabledFeatures = &enabledFeature,
             };
 
-            CheckResult(NativeInstanceApi.vkCreateDevice(NativePhysicalDevice, in deviceCreateInfo, null, out nativeDevice));
+            // Another API sharing the device may create it (an OpenXR runtime, for instance)
+            if (VulkanCreationHooks.CreateDevice is { } createDevice)
+                CheckResult(createDevice(NativeInstance, NativePhysicalDevice, &deviceCreateInfo, out nativeDevice));
+            else
+                CheckResult(NativeInstanceApi.vkCreateDevice(NativePhysicalDevice, in deviceCreateInfo, null, out nativeDevice));
             EnabledFeatures = enabledFeature;
 
             nativeDeviceApi = new VkDeviceApi(NativeInstanceApi, in nativeDevice);

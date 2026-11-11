@@ -18,8 +18,15 @@ namespace Stride.VirtualReality
 {
     public unsafe partial class OpenXRHmd
     {
-        // The runtime made by PrepareGraphicsDevice, before the device existed, so its Vulkan extensions could be requested
-        private static (XR Xr, Instance Instance, ulong SystemId, bool Passthrough)? preparedRuntime;
+        // The Vulkan version Stride's instance asks for (GraphicsAdapterFactoryInstance)
+        private static readonly Version StrideVulkanVersion = new(1, 3);
+
+        // The runtime made by PrepareGraphicsDevice, before the device existed, so it could take part in creating it
+        private static (XR Xr, Instance Instance, ulong SystemId, bool Passthrough, bool VulkanEnable2)? preparedRuntime;
+
+        // XR_KHR_vulkan_enable2: the runtime creates the Vulkan instance and device. Otherwise XR_KHR_vulkan_enable:
+        // Stride creates them with the extensions the runtime asks for.
+        private bool vulkanEnable2;
 
         private SwapchainImageVulkanKHR[]? vulkanImages;
         private Texture[]? swapchainTextures;
@@ -28,6 +35,12 @@ namespace Stride.VirtualReality
         {
             if (preparedRuntime is not null)
                 return true;
+
+            if (GraphicsAdapterFactory.IsInitialized)
+            {
+                Logger.Error("OpenXRHmd.PrepareGraphicsDevice() must be called before the graphics device is created or the graphics adapters are enumerated; VR is not available");
+                return false;
+            }
 
             XR xr;
             try
@@ -60,13 +73,50 @@ namespace Stride.VirtualReality
                 return false;
             }
 
-            foreach (var name in GetVulkanExtensions(xr, instance, systemId, "xrGetVulkanInstanceExtensionsKHR"))
-                VulkanExtensionRequests.AddInstanceExtension(name);
+            // CreateRuntime enabled XR_KHR_vulkan_enable2 when the runtime has it
+            var vulkanEnable2 = xr.HasVulkanEnable2();
 
-            foreach (var name in GetVulkanExtensions(xr, instance, systemId, "xrGetVulkanDeviceExtensionsKHR"))
-                VulkanExtensionRequests.AddDeviceExtension(name);
+            if (!CheckVulkanRequirements(xr, instance, systemId, vulkanEnable2))
+            {
+                xr.DestroyInstance(instance);
+                xr.Dispose();
+                return false;
+            }
 
-            preparedRuntime = (xr, instance, systemId, requestPassthrough);
+            if (vulkanEnable2)
+            {
+                Logger.Info($"Using {OpenXRUtils.XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME}");
+                VulkanCreationHooks.CreateInstance = (VkInstanceCreateInfo* createInfo, out VkInstance vulkanInstance)
+                    => CreateVulkanInstance(xr, instance, systemId, createInfo, out vulkanInstance);
+                VulkanCreationHooks.CreateDevice = (VkInstance vulkanInstance, VkPhysicalDevice physicalDevice, VkDeviceCreateInfo* createInfo, out VkDevice device)
+                    => CreateVulkanDevice(xr, instance, systemId, vulkanInstance, physicalDevice, createInfo, out device);
+            }
+            else
+            {
+                Logger.Info($"Using {OpenXRUtils.XR_KHR_VULKAN_ENABLE_EXTENSION_NAME}");
+                foreach (var name in GetVulkanExtensions(xr, instance, systemId, "xrGetVulkanInstanceExtensionsKHR"))
+                    VulkanCreationHooks.AddInstanceExtension(name);
+
+                foreach (var name in GetVulkanExtensions(xr, instance, systemId, "xrGetVulkanDeviceExtensionsKHR"))
+                    VulkanCreationHooks.AddDeviceExtension(name);
+            }
+
+            // The runtime's GPU becomes the default adapter, so a laptop with two GPUs renders on the one driving the headset
+            VulkanCreationHooks.PreferredPhysicalDevice = vulkanInstance =>
+            {
+                try
+                {
+                    return GetVulkanPhysicalDevice(xr, instance, systemId, vulkanEnable2, vulkanInstance);
+                }
+                catch (OpenXRException e)
+                {
+                    // Not worth failing the game over: the default adapter order stays, and the session warns about a GPU mismatch
+                    Logger.Warning($"Could not get the OpenXR runtime's GPU: {e.Message}");
+                    return VkPhysicalDevice.Null;
+                }
+            };
+
+            preparedRuntime = (xr, instance, systemId, requestPassthrough, vulkanEnable2);
             return true;
         }
 
@@ -79,7 +129,7 @@ namespace Stride.VirtualReality
                 Logger.Warning("Passthrough was not requested in PrepareGraphicsDevice, so it is not available");
 
             preparedRuntime = null;
-            return new OpenXRHmd(runtime.Xr, runtime.Instance, runtime.SystemId, runtime.Passthrough);
+            return new OpenXRHmd(runtime.Xr, runtime.Instance, runtime.SystemId, runtime.Passthrough) { vulkanEnable2 = runtime.VulkanEnable2 };
         }
 
         private static PfnVoidFunction GetFunction(XR xr, Instance instance, string name)
@@ -90,8 +140,37 @@ namespace Stride.VirtualReality
         }
 
         /// <summary>
-        ///   Calls xrGetVulkanInstanceExtensionsKHR or xrGetVulkanDeviceExtensionsKHR, which share a signature
-        ///   and return the names in one space-separated string.
+        ///   Gets the Vulkan versions the runtime supports, which the runtime requires before the Vulkan instance or the
+        ///   session is created, and checks Stride's version is one of them.
+        /// </summary>
+        private static bool CheckVulkanRequirements(XR xr, Instance instance, ulong systemId, bool vulkanEnable2)
+        {
+            // xrGetVulkanGraphicsRequirements2KHR has the signature and structure layout of the version 1 function
+            var functionName = vulkanEnable2 ? "xrGetVulkanGraphicsRequirements2KHR" : "xrGetVulkanGraphicsRequirementsKHR";
+            var getRequirements = (delegate* unmanaged<Instance, ulong, GraphicsRequirementsVulkanKHR*, Result>)GetFunction(xr, instance, functionName).Handle;
+            var requirements = new GraphicsRequirementsVulkanKHR
+            {
+                Type = vulkanEnable2 ? StructureType.GraphicsRequirementsVulkan2Khr : StructureType.GraphicsRequirementsVulkanKhr,
+            };
+            getRequirements(instance, systemId, &requirements).CheckResult(functionName);
+
+            var min = (Version)(Version64)requirements.MinApiVersionSupported;
+            var max = (Version)(Version64)requirements.MaxApiVersionSupported;
+            Logger.Debug($"Vulkan versions supported by the OpenXR runtime: {min.Major}.{min.Minor} to {max.Major}.{max.Minor}");
+
+            // The runtime may support newer minor versions than it was tested with, so only the major version caps
+            if (StrideVulkanVersion.Major < min.Major || (StrideVulkanVersion.Major == min.Major && StrideVulkanVersion.Minor < min.Minor) || StrideVulkanVersion.Major > max.Major)
+            {
+                Logger.Error($"The OpenXR runtime supports Vulkan {min.Major}.{min.Minor} to {max.Major}.{max.Minor}, but Stride uses Vulkan {StrideVulkanVersion.Major}.{StrideVulkanVersion.Minor}; VR is not available");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///   Calls xrGetVulkanInstanceExtensionsKHR or xrGetVulkanDeviceExtensionsKHR (XR_KHR_vulkan_enable), which share
+        ///   a signature and return the names in one space-separated string.
         /// </summary>
         private static string[] GetVulkanExtensions(XR xr, Instance instance, ulong systemId, string functionName)
         {
@@ -112,21 +191,102 @@ namespace Stride.VirtualReality
             return names;
         }
 
+        /// <summary>
+        ///   Creates the Vulkan instance through xrCreateVulkanInstanceKHR (XR_KHR_vulkan_enable2), which adds the
+        ///   extensions the runtime needs to Stride's create info.
+        /// </summary>
+        private static VkResult CreateVulkanInstance(XR xr, Instance instance, ulong systemId, VkInstanceCreateInfo* createInfo, out VkInstance vulkanInstance)
+        {
+            var createVulkanInstance = (delegate* unmanaged<Instance, VulkanInstanceCreateInfoKHR*, nint*, VkResult*, Result>)GetFunction(xr, instance, "xrCreateVulkanInstanceKHR").Handle;
+            var xrCreateInfo = new VulkanInstanceCreateInfoKHR
+            {
+                Type = StructureType.VulkanInstanceCreateInfoKhr,
+                SystemId = systemId,
+                PfnGetInstanceProcAddr = new PfnVoidFunction((delegate* unmanaged[Cdecl]<void>)Vulkan.vkGetInstanceProcAddr_ptr),
+                VulkanCreateInfo = createInfo,
+            };
+
+            nint handle = 0;
+            var vulkanResult = VkResult.Success;
+            var result = createVulkanInstance(instance, &xrCreateInfo, &handle, &vulkanResult);
+            vulkanInstance = new VkInstance(handle);
+            if (!result.Success())
+            {
+                Logger.Error($"xrCreateVulkanInstanceKHR failed: {result}");
+                return vulkanResult != VkResult.Success ? vulkanResult : VkResult.ErrorInitializationFailed;
+            }
+            return vulkanResult;
+        }
+
+        /// <summary>
+        ///   Creates the Vulkan device through xrCreateVulkanDeviceKHR (XR_KHR_vulkan_enable2), which adds the extensions
+        ///   the runtime needs to Stride's create info.
+        /// </summary>
+        private static VkResult CreateVulkanDevice(XR xr, Instance instance, ulong systemId, VkInstance vulkanInstance, VkPhysicalDevice physicalDevice, VkDeviceCreateInfo* createInfo, out VkDevice device)
+        {
+            // The runtime only creates a device on its own GPU; on another one Stride renders without the headset
+            var runtimePhysicalDevice = GetVulkanPhysicalDevice(xr, instance, systemId, vulkanEnable2: true, vulkanInstance);
+            if (runtimePhysicalDevice != physicalDevice)
+            {
+                Logger.Warning("The graphics device uses another GPU than the OpenXR runtime; VR is not available on it");
+                return Vulkan.GetApi(vulkanInstance).vkCreateDevice(physicalDevice, createInfo, null, out device);
+            }
+
+            var createVulkanDevice = (delegate* unmanaged<Instance, VulkanDeviceCreateInfoKHR*, nint*, VkResult*, Result>)GetFunction(xr, instance, "xrCreateVulkanDeviceKHR").Handle;
+            var xrCreateInfo = new VulkanDeviceCreateInfoKHR
+            {
+                Type = StructureType.VulkanDeviceCreateInfoKhr,
+                SystemId = systemId,
+                PfnGetInstanceProcAddr = new PfnVoidFunction((delegate* unmanaged[Cdecl]<void>)Vulkan.vkGetInstanceProcAddr_ptr),
+                VulkanPhysicalDevice = new VkHandle(physicalDevice.Handle),
+                VulkanCreateInfo = createInfo,
+            };
+
+            nint handle = 0;
+            var vulkanResult = VkResult.Success;
+            var result = createVulkanDevice(instance, &xrCreateInfo, &handle, &vulkanResult);
+            device = new VkDevice(handle);
+            if (!result.Success())
+            {
+                Logger.Error($"xrCreateVulkanDeviceKHR failed: {result}");
+                return vulkanResult != VkResult.Success ? vulkanResult : VkResult.ErrorInitializationFailed;
+            }
+            return vulkanResult;
+        }
+
+        /// <summary>
+        ///   Gets the physical device the runtime renders with, through xrGetVulkanGraphicsDevice2KHR or
+        ///   xrGetVulkanGraphicsDeviceKHR.
+        /// </summary>
+        private static VkPhysicalDevice GetVulkanPhysicalDevice(XR xr, Instance instance, ulong systemId, bool vulkanEnable2, VkInstance vulkanInstance)
+        {
+            nint physicalDevice;
+            if (vulkanEnable2)
+            {
+                var getDevice = (delegate* unmanaged<Instance, VulkanGraphicsDeviceGetInfoKHR*, nint*, Result>)GetFunction(xr, instance, "xrGetVulkanGraphicsDevice2KHR").Handle;
+                var getInfo = new VulkanGraphicsDeviceGetInfoKHR
+                {
+                    Type = StructureType.VulkanGraphicsDeviceGetInfoKhr,
+                    SystemId = systemId,
+                    VulkanInstance = new VkHandle(vulkanInstance.Handle),
+                };
+                getDevice(instance, &getInfo, &physicalDevice).CheckResult("xrGetVulkanGraphicsDevice2KHR");
+            }
+            else
+            {
+                var getDevice = (delegate* unmanaged<Instance, ulong, nint, nint*, Result>)GetFunction(xr, instance, "xrGetVulkanGraphicsDeviceKHR").Handle;
+                getDevice(instance, systemId, vulkanInstance.Handle, &physicalDevice).CheckResult("xrGetVulkanGraphicsDeviceKHR");
+            }
+            return new VkPhysicalDevice(physicalDevice);
+        }
+
         private GraphicsBindingVulkanKHR CreateVulkanGraphicsBinding(GraphicsDevice device)
         {
-            // The runtime requires this call before the session is created
-            var getRequirements = (delegate* unmanaged<Instance, ulong, GraphicsRequirementsVulkanKHR*, Result>)GetFunction(Xr, Instance, "xrGetVulkanGraphicsRequirementsKHR").Handle;
-            var requirements = new GraphicsRequirementsVulkanKHR { Type = StructureType.GraphicsRequirementsVulkanKhr };
-            getRequirements(Instance, SystemId, &requirements).CheckResult("xrGetVulkanGraphicsRequirementsKHR");
-            Logger.Debug($"Vulkan API versions supported by the runtime: {requirements.MinApiVersionSupported} to {requirements.MaxApiVersionSupported}");
-
             // The session must use the physical device the runtime renders with
-            var getDevice = (delegate* unmanaged<Instance, ulong, nint, nint*, Result>)GetFunction(Xr, Instance, "xrGetVulkanGraphicsDeviceKHR").Handle;
-            nint runtimePhysicalDevice;
-            getDevice(Instance, SystemId, device.NativeInstance.Handle, &runtimePhysicalDevice).CheckResult("xrGetVulkanGraphicsDeviceKHR");
-            if (runtimePhysicalDevice != device.NativePhysicalDevice.Handle)
+            if (GetVulkanPhysicalDevice(Xr, Instance, SystemId, vulkanEnable2, device.NativeInstance) != device.NativePhysicalDevice)
                 Logger.Warning($"The OpenXR runtime renders on another GPU than {device.Adapter.Description}; the headset may stay black");
 
+            // XrGraphicsBindingVulkan2KHR has the layout and structure type of the version 1 binding
             return new GraphicsBindingVulkanKHR
             {
                 Type = StructureType.GraphicsBindingVulkanKhr,
@@ -138,6 +298,12 @@ namespace Stride.VirtualReality
                 QueueFamilyIndex = 0,
                 QueueIndex = 0,
             };
+        }
+
+        private void ResetVulkanCreationHooks()
+        {
+            // The hooks call into this instance, which is about to go; a device created later is a plain one
+            VulkanCreationHooks.Reset();
         }
 
         /// <summary>

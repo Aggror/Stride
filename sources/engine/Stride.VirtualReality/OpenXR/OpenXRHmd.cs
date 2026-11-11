@@ -26,14 +26,15 @@ namespace Stride.VirtualReality
         public static List<string> extensions = [];
 
         /// <summary>
-        /// Creates a VR device using OpenXR.
+        /// Prepares OpenXR before the graphics device exists. On Vulkan the runtime takes part in creating the
+        /// Vulkan instance and device, and picks the GPU, so call this before the game creates its graphics device
+        /// (first thing in Main). Other graphics APIs need nothing and return <see langword="true"/>.
         /// </summary>
-        /// <param name="requestPassthrough">Whether or not the XR_FB_passthrough extension should be enabled (if available).</param>
-        /// <summary>
-        /// Prepares OpenXR before the graphics device exists. On Vulkan the runtime needs extensions on the
-        /// Vulkan instance and device, so call this before the game creates its graphics device (first thing
-        /// in Main). Other graphics APIs need nothing and return <see langword="true"/>.
-        /// </summary>
+        /// <remarks>
+        /// With <c>XR_KHR_vulkan_enable2</c> the runtime creates the Vulkan instance and device itself; with
+        /// <c>XR_KHR_vulkan_enable</c>, used when the runtime has no version 2, Stride creates them with the
+        /// extensions the runtime asks for.
+        /// </remarks>
         /// <param name="requestPassthrough">Whether or not the XR_FB_passthrough extension should be enabled (if available).</param>
         /// <returns><see langword="false"/> when no OpenXR runtime or headset is available; the game then runs without VR.</returns>
         public static bool PrepareGraphicsDevice(bool requestPassthrough = false)
@@ -45,6 +46,10 @@ namespace Stride.VirtualReality
 #endif
         }
 
+        /// <summary>
+        /// Creates a VR device using OpenXR.
+        /// </summary>
+        /// <param name="requestPassthrough">Whether or not the XR_FB_passthrough extension should be enabled (if available).</param>
         internal static OpenXRHmd? New(bool requestPassthrough)
         {
 #if STRIDE_GRAPHICS_API_VULKAN
@@ -966,6 +971,7 @@ namespace Stride.VirtualReality
             }
 #elif STRIDE_GRAPHICS_API_VULKAN
             DisposeVulkanSwapchainTextures();
+            ResetVulkanCreationHooks();
 #endif
 
             if (globalPlaySpace.Handle != 0)

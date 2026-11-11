@@ -74,6 +74,19 @@ namespace Stride.Graphics
             // The fastest kind first, as DXGI's high-performance order does on Direct3D: a hybrid laptop enumerates its integrated GPU first.
             physicalDevices.Sort((a, b) => PerformanceRank(a.Properties.deviceType).CompareTo(PerformanceRank(b.Properties.deviceType)));
 
+            // Another API sharing the device may need a given GPU (the one an OpenXR runtime renders with, for instance);
+            // it goes first, so it's the default adapter
+            if (VulkanCreationHooks.PreferredPhysicalDevice?.Invoke(defaultInstance.NativeInstance) is { } preferred && preferred != VkPhysicalDevice.Null)
+            {
+                var preferredIndex = physicalDevices.FindIndex(x => x.Device == preferred);
+                if (preferredIndex > 0)
+                {
+                    var preferredDevice = physicalDevices[preferredIndex];
+                    physicalDevices.RemoveAt(preferredIndex);
+                    physicalDevices.Insert(0, preferredDevice);
+                }
+            }
+
             var adapterList = new List<GraphicsAdapter>();
             var displays = DisplayEnumeration.Capture();
             for (int index = 0; index < physicalDevices.Count; index++)
@@ -297,11 +310,11 @@ namespace Stride.Graphics
                 desiredExtensionNames.Add(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 
             // Extensions another API sharing the device asked for (an OpenXR runtime, for instance)
-            if (VulkanExtensionRequests.InstanceExtensions.Count > 0)
+            if (VulkanCreationHooks.InstanceExtensions.Count > 0)
             {
-                var requestedExtensionNames = new VkUtf8String[VulkanExtensionRequests.InstanceExtensions.Count];
+                var requestedExtensionNames = new VkUtf8String[VulkanCreationHooks.InstanceExtensions.Count];
                 for (int i = 0; i < requestedExtensionNames.Length; i++)
-                    requestedExtensionNames[i] = VulkanExtensionRequests.InstanceExtensions[i];
+                    requestedExtensionNames[i] = VulkanCreationHooks.InstanceExtensions[i];
 
                 var availableRequestedNames = GetAvailableExtensionNames(requestedExtensionNames);
                 foreach (var name in requestedExtensionNames)
@@ -396,7 +409,10 @@ namespace Stride.Graphics
                 if (layerSettingCount > 0)
                     instanceCreateInfo.pNext = &layerSettings;
 
-                result = vkCreateInstance(&instanceCreateInfo, out NativeInstance);
+                // Another API sharing the instance may create it (an OpenXR runtime, for instance)
+                result = VulkanCreationHooks.CreateInstance is { } createInstance
+                    ? createInstance(&instanceCreateInfo, out NativeInstance)
+                    : vkCreateInstance(&instanceCreateInfo, out NativeInstance);
             }
             if (result != VK_SUCCESS)
                 throw new InvalidOperationException($"Failed to create vulkan instance: {result}");

@@ -20,6 +20,11 @@ namespace Stride.Graphics
         private static GraphicsAdapter defaultAdapter;
 
         /// <summary>
+        ///   Gets whether the adapters were enumerated already, so the graphics API's instance exists.
+        /// </summary>
+        internal static bool IsInitialized => isInitialized;
+
+        /// <summary>
         ///   Initializes the <see cref="GraphicsAdapterFactory"/>. On Desktop and WinRT, this is done statically.
         /// </summary>
         public static void Initialize()
