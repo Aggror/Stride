@@ -84,7 +84,7 @@ namespace Stride.VirtualReality
                         }
                         case VRApi.OpenXR:
                             {
-#if STRIDE_GRAPHICS_API_DIRECT3D11
+#if STRIDE_GRAPHICS_API_DIRECT3D11 || STRIDE_GRAPHICS_API_VULKAN
                                 Device = OpenXRHmd.New(RequestPassthrough);
 #endif
                                 break;

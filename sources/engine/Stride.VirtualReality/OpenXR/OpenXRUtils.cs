@@ -18,6 +18,7 @@ namespace Stride.VirtualReality
     internal static unsafe class OpenXRUtils
     {
         public const string XR_KHR_D3D11_ENABLE_EXTENSION_NAME = "XR_KHR_D3D11_enable";
+        public const string XR_KHR_VULKAN_ENABLE_EXTENSION_NAME = "XR_KHR_vulkan_enable";
         public const string XR_FB_PASSTHROUGH_EXTENSION_NAME = "XR_FB_passthrough";
 
         public static bool Success(this Result result) => result >= 0;
@@ -49,6 +50,8 @@ namespace Stride.VirtualReality
             var openXrExtensions = new List<String>();
 #if STRIDE_GRAPHICS_API_DIRECT3D11
             openXrExtensions.Add(XR_KHR_D3D11_ENABLE_EXTENSION_NAME);
+#elif STRIDE_GRAPHICS_API_VULKAN
+            openXrExtensions.Add(XR_KHR_VULKAN_ENABLE_EXTENSION_NAME);
 #endif
 #if DEBUG_OPENXR
             openXrExtensions.Add("XR_EXT_debug_utils");
@@ -90,6 +93,12 @@ namespace Stride.VirtualReality
             if (!availableExtensions.Contains("XR_KHR_D3D11_enable"))
             {
                 logger.Error($"OpenXR error! Current implementation doesn't support Direct3D 11");
+                return default;
+            }
+#elif STRIDE_GRAPHICS_API_VULKAN
+            if (!availableExtensions.Contains(XR_KHR_VULKAN_ENABLE_EXTENSION_NAME))
+            {
+                logger.Error($"OpenXR error! The OpenXR runtime doesn't support Vulkan ({XR_KHR_VULKAN_ENABLE_EXTENSION_NAME})");
                 return default;
             }
 #endif

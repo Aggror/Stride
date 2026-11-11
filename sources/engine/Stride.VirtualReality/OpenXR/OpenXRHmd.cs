@@ -20,7 +20,7 @@ using Silk.NET.Direct3D11;
 
 namespace Stride.VirtualReality
 {
-    public unsafe class OpenXRHmd : VRDevice
+    public unsafe partial class OpenXRHmd : VRDevice
     {
         // Public static variable to add extensions to the initialization of the openXR session
         public static List<string> extensions = [];
@@ -29,8 +29,31 @@ namespace Stride.VirtualReality
         /// Creates a VR device using OpenXR.
         /// </summary>
         /// <param name="requestPassthrough">Whether or not the XR_FB_passthrough extension should be enabled (if available).</param>
+        /// <summary>
+        /// Prepares OpenXR before the graphics device exists. On Vulkan the runtime needs extensions on the
+        /// Vulkan instance and device, so call this before the game creates its graphics device (first thing
+        /// in Main). Other graphics APIs need nothing and return <see langword="true"/>.
+        /// </summary>
+        /// <param name="requestPassthrough">Whether or not the XR_FB_passthrough extension should be enabled (if available).</param>
+        /// <returns><see langword="false"/> when no OpenXR runtime or headset is available; the game then runs without VR.</returns>
+        public static bool PrepareGraphicsDevice(bool requestPassthrough = false)
+        {
+#if STRIDE_GRAPHICS_API_VULKAN
+            return PrepareVulkan(requestPassthrough);
+#else
+            return true;
+#endif
+        }
+
         internal static OpenXRHmd? New(bool requestPassthrough)
         {
+#if STRIDE_GRAPHICS_API_VULKAN
+            // Without PrepareGraphicsDevice the Vulkan device lacks the runtime's extensions
+            var prepared = TakePreparedRuntime(requestPassthrough);
+            if (prepared is null)
+                Logger.Warning("OpenXR on Vulkan needs OpenXRHmd.PrepareGraphicsDevice() before the graphics device is created");
+            return prepared;
+#else
             // Create our API object for OpenXR.
             var xr = XR.GetApi();
             if (xr is null)
@@ -41,6 +64,7 @@ namespace Stride.VirtualReality
 
             // Takes ownership on API object
             return new OpenXRHmd(xr, requestPassthrough);
+#endif
         }
 
         // API Objects for accessing OpenXR
@@ -120,7 +144,7 @@ namespace Stride.VirtualReality
         {
             get
             {
-#if STRIDE_GRAPHICS_API_DIRECT3D11
+#if STRIDE_GRAPHICS_API_DIRECT3D11 || STRIDE_GRAPHICS_API_VULKAN
                 return SystemId != 0;
 #else
                 return false;
@@ -154,6 +178,17 @@ namespace Stride.VirtualReality
 
             Instance = OpenXRUtils.CreateRuntime(xr, requestedExtensions, Logger);
             SystemId = Instance.Handle != 0 ? OpenXRUtils.GetSystem(xr, Instance, Logger) : default;
+            SupportsPassthrough = requestPassthrough && Xr.IsInstanceExtensionPresent(null, OpenXRUtils.XR_FB_PASSTHROUGH_EXTENSION_NAME);
+        }
+
+        // Takes ownership of a runtime created before the graphics device (see PrepareGraphicsDevice)
+        private OpenXRHmd(XR xr, Instance instance, ulong systemId, bool requestPassthrough)
+        {
+            Xr = xr;
+            VRApi = VRApi.OpenXR;
+            passthroughRequested = requestPassthrough;
+            Instance = instance;
+            SystemId = systemId;
             SupportsPassthrough = requestPassthrough && Xr.IsInstanceExtensionPresent(null, OpenXRUtils.XR_FB_PASSTHROUGH_EXTENSION_NAME);
         }
 
@@ -235,8 +270,17 @@ namespace Stride.VirtualReality
                 Next = &graphics_binding_dx11,
                 SystemId = SystemId
             };
+#elif STRIDE_GRAPHICS_API_VULKAN
+            Logger.Debug("Initializing Vulkan graphics device");
+            var graphics_binding_vulkan = CreateVulkanGraphicsBinding(baseDevice);
+            session_create_info = new SessionCreateInfo()
+            {
+                Type = StructureType.SessionCreateInfo,
+                Next = &graphics_binding_vulkan,
+                SystemId = SystemId
+            };
 #else
-            throw new Exception("OpenXR is only compatible with DirectX11");
+            throw new Exception("OpenXR is only compatible with Direct3D 11 and Vulkan");
 #endif
 
             Session session;
@@ -244,6 +288,9 @@ namespace Stride.VirtualReality
             globalSession = session;
 
             // --- Create swapchain for main VR rendering
+#if STRIDE_GRAPHICS_API_VULKAN
+            var swapchainFormat = SelectVulkanSwapchainFormat(session, out var swapchainPixelFormat);
+#endif
             Swapchain swapchain = new Swapchain();
             SwapchainCreateInfo swapchain_create_info = new()
             {
@@ -255,6 +302,8 @@ namespace Stride.VirtualReality
                 CreateFlags = 0,
 #if STRIDE_GRAPHICS_API_DIRECT3D11
                 Format = (long)PixelFormat.R8G8B8A8_UNorm_SRgb,
+#elif STRIDE_GRAPHICS_API_VULKAN
+                Format = swapchainFormat,
 #endif
                 SampleCount = viewconfig_views[0].RecommendedSwapchainSampleCount,
                 Width = (uint)renderSize.Width,
@@ -266,6 +315,10 @@ namespace Stride.VirtualReality
 
             Xr.CreateSwapchain(session, &swapchain_create_info, &swapchain).CheckResult();
             globalSwapchain = swapchain;
+
+#if STRIDE_GRAPHICS_API_VULKAN
+            CreateVulkanSwapchainTextures(baseDevice, swapchain, swapchainPixelFormat);
+#endif
 
             uint img_count = 0;
             Xr.EnumerateSwapchainImages(swapchain, 0, ref img_count, null).CheckResult();
@@ -498,7 +551,7 @@ namespace Stride.VirtualReality
             headPos.Z = views[0].Pose.Position.Z;
         }
 
-#if STRIDE_GRAPHICS_API_DIRECT3D11
+#if STRIDE_GRAPHICS_API_DIRECT3D11 || STRIDE_GRAPHICS_API_VULKAN
         public unsafe uint GetSwapchainImage()
         {
             // Logger.Warning("AcquireSwapchainImage");
@@ -546,6 +599,9 @@ namespace Stride.VirtualReality
 #if STRIDE_GRAPHICS_API_DIRECT3D11
             if (render_targets is null)
                 return;
+#elif STRIDE_GRAPHICS_API_VULKAN
+            if (swapchainTextures is null)
+                return;
 #endif
 
             // if we didn't wait a frame, don't commit
@@ -567,6 +623,8 @@ namespace Stride.VirtualReality
                 render_targets[swapchainPointer]->GetResource(&swapChainRenderTargetResource);
 
                 baseDevice.NativeDeviceContext.CopyResource(renderFrameResource, swapChainRenderTargetResource);
+#elif STRIDE_GRAPHICS_API_VULKAN
+                CopyToVulkanSwapchain(commandList, renderFrame);
 #endif
 
                 // Release the swapchain image
@@ -906,6 +964,8 @@ namespace Stride.VirtualReality
                     render_target->Release();
                 }
             }
+#elif STRIDE_GRAPHICS_API_VULKAN
+            DisposeVulkanSwapchainTextures();
 #endif
 
             if (globalPlaySpace.Handle != 0)
